@@ -3,7 +3,7 @@
 
 experiences:
   - id: exp1
-    title: "MVP GenAI Traduction"
+    title: "WaveTranslate - MVP GenAI Traduction"
     client: "Wavestone"
     duration: "12 mois"
     date: "2023-12"
@@ -90,7 +90,7 @@ experiences:
     sector: "Transport"
 
   - id: exp5
-    title: "Serveur MCP Génération PowerPoint"
+    title: "WavePPT - Serveur MCP génération PowerPoint"
     client: "Wavestone"
     duration: "4 mois"
     date: "2025-06"
