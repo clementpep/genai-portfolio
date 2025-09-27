@@ -6,21 +6,24 @@ A premium portfolio showcasing GenAI and Agentic AI expertise with an elegant da
 
 ### 🎨 Premium Design
 - **Luxury Color Palette**: Premium dark green (#1f4135), cream, and light gray
-- **Stone-Textured Background**: Subtle crosshatch pattern for premium feel
+- **Brushed Metal Background**: Elegant diagonal brushed metal texture on light background
 - **Elegant Typography**: Playfair Display for headers, Inter for body
 - **Smooth Animations**: Refined transitions and micro-interactions
 - **Apple-Inspired UX**: Clean, spacious, and sophisticated interface
 
 ### 🚀 Interactive Components
-- **Carousel Navigation**: Browse experiences, skills, certifications, and education
-- **Navigation Buttons**: Large, accessible ◀ ▶ buttons aligned with content
-- **Interactive Timeline**: Visual indicator showing current position (navigate with arrows)
+- **Wide Carousel Cards**: Expanded cards (900px) for better content visibility
+- **Compact Navigation**: Small circular arrows (48px) with hover effects
+- **Chronological Timeline**: Sorted by date with clickable dots to jump between items
+- **Timeline Visual**: Line passes through dots showing progression
 - **Smart Navigation**: Category tabs for quick switching
 - **Responsive Cards**: Detailed information with smooth hover effects
 - **Icon Indicators**: Visual icons on stat cards for better scannability
 
 ### 🤖 AI-Powered Chat
 - **SmolAgent Integration**: Intelligent agent with custom tools
+- **Robot Avatar**: Custom SVG robot icon for assistant
+- **Optimized UI**: White text on green background for messages, circular send button
 - **Dual LLM Support**: Choose between free HuggingFace or paid OpenAI/Claude
 - **Custom Tools**:
   - `list_clement_experiences` - Filter experiences by technology, client, or sector
@@ -37,7 +40,7 @@ A premium portfolio showcasing GenAI and Agentic AI expertise with an elegant da
 ## 📁 Project Structure
 
 ```
-genai-portfolio/
+portfolio-genai/
 ├── app.py                  # Main application with both LLM options
 ├── portfolio_data.yaml     # All portfolio content (easy to update)
 ├── requirements.txt        # Python dependencies
@@ -54,7 +57,7 @@ genai-portfolio/
 ```bash
 # Clone repository
 git clone <your-repo>
-cd genai-portfolio
+cd portfolio-genai
 
 # Install dependencies
 pip install -r requirements.txt
@@ -327,7 +330,7 @@ To use PNG logos instead of emojis:
    ```
    Type: CNAME
    Name: portfolio
-   Value: username-genai-portfolio.hf.space
+   Value: username-portfolio-genai.hf.space
    ```
 3. Wait for DNS propagation (up to 48h)
 

@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+logos_path = os.path.join(os.path.dirname(__file__), "logos")
+
 # Determine which LLM to use based on environment
 USE_HF_MODEL = os.getenv("USE_HF_MODEL", "true").lower() == "true"
 
@@ -55,23 +57,14 @@ CUSTOM_CSS = f"""
 
 .gradio-container {{
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    background: 
-        repeating-linear-gradient(
-            90deg,
-            {COLORS['background']},
-            {COLORS['background']} 2px,
-            rgba(222, 226, 230, 0.3) 2px,
-            rgba(222, 226, 230, 0.3) 3px
-        ),
-        repeating-linear-gradient(
-            0deg,
-            {COLORS['background']},
-            {COLORS['background']} 2px,
-            rgba(222, 226, 230, 0.2) 2px,
-            rgba(222, 226, 230, 0.2) 3px
-        ),
-        linear-gradient(180deg, {COLORS['background']} 0%, #f0f2f5 100%) !important;
-    background-size: 80px 80px, 80px 80px, 100% 100% !important;
+
+    /* Use absolute path served by HF/Gradio (leading slash), plus safe fallback */
+    background-image: url('/logos/textures/metal_brushed.png') !important;
+    background-color: {COLORS['background']};
+    background-repeat: repeat;
+    background-size: auto;       /* keep natural pattern scale */
+    background-position: center center !important;
+    background-blend-mode: multiply;
     max-width: 1400px !important;
     margin: 0 auto !important;
     padding: 2rem !important;
@@ -132,28 +125,27 @@ CUSTOM_CSS = f"""
     box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
 }}
 
+/* --- Carousel / card sizing improvements --- */
 .carousel-wrapper {{
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
+    gap: 1.5rem;
     margin: 2rem 0;
     min-height: 480px;
-}}
-
-.carousel-wrapper > div {{
-    display: flex;
-    align-items: center;
+    width: 100%;
 }}
 
 .carousel-container {{
-    flex: 1;
-    max-width: 700px;
+    flex: 6;                         /* allow center column to take most space */
+    max-width: 1100px;               /* increase available card width */
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     perspective: 1000px;
+    padding: 0 1rem;
 }}
 
 .card {{
@@ -161,6 +153,7 @@ CUSTOM_CSS = f"""
     border-radius: 24px;
     padding: 2.5rem;
     width: 100%;
+    max-width: 1000px;               /* wider card */
     min-height: 420px;
     box-shadow: 0 4px 20px {COLORS['shadow']}, 0 1px 3px rgba(0, 0, 0, 0.05);
     border: 1px solid {COLORS['border']};
@@ -168,6 +161,7 @@ CUSTOM_CSS = f"""
     position: relative;
     display: flex;
     flex-direction: column;
+    margin: 0 auto;
 }}
 
 .card:hover {{
@@ -263,9 +257,9 @@ CUSTOM_CSS = f"""
 .timeline::before {{
     content: '';
     position: absolute;
-    top: 50%;
+    top: calc(2.5rem + 10px);
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     width: calc(100% - 20%);
     height: 3px;
     background: linear-gradient(90deg, 
@@ -295,11 +289,13 @@ CUSTOM_CSS = f"""
     border: 3px solid {COLORS['border']};
     transition: all 0.3s ease;
     margin-bottom: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }}
 
 .timeline-item:hover .timeline-dot {{
     transform: scale(1.2);
     border-color: {COLORS['primary_light']};
+    box-shadow: 0 4px 12px {COLORS['shadow']};
 }}
 
 .timeline-item.active .timeline-dot {{
@@ -348,31 +344,33 @@ CUSTOM_CSS = f"""
     box-shadow: 0 6px 20px {COLORS['shadow']} !important;
 }}
 
+/* --- Carousel nav buttons: perfect circle, fixed size --- */
 .carousel-nav-btn {{
-    background: {COLORS['surface']} !important;
-    border: 2px solid {COLORS['border']} !important;
-    border-radius: 50% !important;
-    min-width: 56px !important;
-    min-height: 56px !important;
     width: 56px !important;
     height: 56px !important;
-    display: flex !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     color: {COLORS['text_primary']} !important;
-    font-size: 1.5rem !important;
+    font-size: 1.25rem !important;
     cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
-    flex-shrink: 0 !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important;
+    padding: 0 !important;
+    background: {COLORS['surface']} !important;
+    border: 2px solid {COLORS['border']} !important;
 }}
 
+/* Hover state for nav buttons */
 .carousel-nav-btn:hover {{
     background: {COLORS['primary']} !important;
     color: white !important;
-    border-color: {COLORS['primary']} !important;
-    transform: scale(1.1) !important;
-    box-shadow: 0 4px 20px {COLORS['shadow']} !important;
+    transform: scale(1.06) !important;
+    border-color: {COLORS['primary_light']} !important;
 }}
 
 .stats-container {{
@@ -508,7 +506,7 @@ input:focus, textarea:focus {{
     border-radius: 16px !important;
 }}
 
-/* Message styling */
+/* Message styling with proper text colors */
 .message {{
     margin: 0.5rem 0 !important;
     border-radius: 16px !important;
@@ -516,12 +514,51 @@ input:focus, textarea:focus {{
 
 .message.user {{
     background: linear-gradient(135deg, {COLORS['gradient_start']}, {COLORS['gradient_end']}) !important;
+}}
+
+.message.user p, .message.user span, .message.user div {{
     color: white !important;
 }}
 
 .message.bot {{
     background: {COLORS['surface']} !important;
     border: 1px solid {COLORS['border']} !important;
+    color: {COLORS['text_primary']} !important;
+}}
+
+.message.bot p, .message.bot span, .message.bot div {{
+    color: {COLORS['text_primary']} !important;
+}}
+
+/* Avatar styling */
+.avatar-container img {{
+    border-radius: 8px !important;
+    background: white !important;
+    padding: 4px !important;
+}}
+
+/* Send button styling */
+#msg-input {{
+    height: 48px !important;
+    min-height: 48px !important;
+    border-radius: 12px !important;
+    padding: 0.6rem 0.85rem !important;
+    box-sizing: border-box !important;
+}}
+
+#send-btn {{
+    height: 48px !important;
+    min-height: 48px !important;
+    border-radius: 12px !important;    /* rounded rectangle */
+    padding: 0 14px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-left: 0.5rem !important;
+    background: linear-gradient(135deg, {COLORS['gradient_start']}, {COLORS['gradient_end']}) !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: 0 6px 20px {COLORS['shadow']} !important;
 }}
 
 /* Improved spacing */
@@ -541,8 +578,8 @@ input:focus, textarea:focus {{
 }}
 
 /* Row and column improvements */
-.gr-row {{
-    margin-bottom: 0 !important;
+.gr-row *[id="msg-input"], .gr-row *[id="send-btn"] {{
+    vertical-align: middle;
 }}
 
 /* Better card shadows on hover */
@@ -858,24 +895,28 @@ def generate_card_html(item: Dict, category: str) -> str:
 
 # Generate timeline HTML with click handlers
 def generate_timeline_html(items: List[Dict], active_index: int, category: str) -> str:
-    """Generate HTML for interactive timeline with JavaScript click handlers"""
+    """Generate HTML for interactive timeline with chronological order"""
+
+    # Sort items by date chronologically (oldest to newest)
+    sorted_items = sorted(
+        enumerate(items),
+        key=lambda x: x[1].get("date", x[1].get("year", x[1].get("period", "0000"))),
+    )
 
     timeline_items = []
-    for i, item in enumerate(items):
+    for original_index, item in sorted_items:
         date = item.get("date", item.get("year", item.get("period", "")))
-        active_class = "active" if i == active_index else ""
+        active_class = "active" if original_index == active_index else ""
 
         timeline_items.append(
             f"""
-        <div class="timeline-item {active_class}" data-index="{i}">
+        <div class="timeline-item {active_class}" onclick="window.jumpToCard({original_index})">
             <div class="timeline-dot"></div>
             <div class="timeline-label">{date}</div>
         </div>
         """
         )
 
-    # Note: Timeline clicks will work via Gradio's built-in mechanisms
-    # Users can use the navigation buttons to move through items
     return f'<div class="timeline">{"".join(timeline_items)}</div>'
 
 
@@ -918,7 +959,7 @@ def create_interface():
                     </svg>
                     LinkedIn
                 </a>
-                <a href="https://github.com/clementpep" target="_blank" class="social-link">
+                <a href="https://github.com/clemenpep" target="_blank" class="social-link">
                     <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                     </svg>
@@ -967,24 +1008,42 @@ def create_interface():
         # Carousel display with proper alignment
         gr.HTML('<div style="margin: 3rem 0 1rem 0;"></div>')  # Spacer
 
+        # Make side buttons small and center column much wider so card gets enough room
         with gr.Row(elem_classes="carousel-wrapper"):
-            prev_btn = gr.Button("◀", elem_classes="carousel-nav-btn")
-            with gr.Column(scale=1, elem_classes="carousel-container"):
+            prev_btn = gr.Button("◀", elem_classes="carousel-nav-btn", scale=1)
+            # center column takes most space -> scale=6
+            with gr.Column(scale=6, elem_classes="carousel-container"):
                 carousel_html = gr.HTML(
                     generate_card_html(PORTFOLIO["experiences"][0], "experiences")
                 )
-            next_btn = gr.Button("▶", elem_classes="carousel-nav-btn")
+            next_btn = gr.Button("▶", elem_classes="carousel-nav-btn", scale=1)
 
-        # Timeline
+        # Timeline with navigation hint
         timeline_html = gr.HTML(
             generate_timeline_html(PORTFOLIO["experiences"], 0, "experiences")
         )
 
+        # Hidden index input for JavaScript communication
+        timeline_jump_index = gr.Number(value=-1, visible=False)
+
         gr.HTML(
             f"""
         <p style="text-align: center; color: {COLORS['text_muted']}; font-size: 0.85rem; margin-top: 1rem;">
-            💡 Utilisez les flèches ◀ ▶ ou les onglets ci-dessus pour naviguer entre les différentes expériences
+            💡 Cliquez sur les points de la timeline ou utilisez les flèches ◀ ▶ pour naviguer
         </p>
+        <script>
+        window.jumpToCard = function(index) {{
+            // Find the hidden number input
+            const inputs = document.querySelectorAll('input[type="number"]');
+            for (let input of inputs) {{
+                if (input.parentElement.style.display === 'none') {{
+                    input.value = index;
+                    input.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                    break;
+                }}
+            }}
+        }}
+        </script>
         """
         )
 
@@ -994,46 +1053,90 @@ def create_interface():
             if items:
                 card = generate_card_html(items[0], category)
                 timeline = generate_timeline_html(items, 0, category)
-                return card, timeline, category, 0
-            return carousel_html.value, timeline_html.value, category, 0
+                return card, timeline, category, 0, -1
+            return carousel_html.value, timeline_html.value, category, 0, -1
 
         def navigate_carousel(direction: int, category: str, current_index: int):
             items = PORTFOLIO.get(category, [])
             if not items:
-                return carousel_html.value, timeline_html.value, current_index
+                return carousel_html.value, timeline_html.value, current_index, -1
 
             new_index = (current_index + direction) % len(items)
             card = generate_card_html(items[new_index], category)
             timeline = generate_timeline_html(items, new_index, category)
-            return card, timeline, new_index
+            return card, timeline, new_index, -1
+
+        def jump_to_timeline_index(jump_index: int, category: str, current_index: int):
+            """Handle timeline click navigation"""
+            if jump_index < 0:  # No jump requested
+                return carousel_html.value, timeline_html.value, current_index, -1
+
+            items = PORTFOLIO.get(category, [])
+            if not items or jump_index >= len(items):
+                return carousel_html.value, timeline_html.value, current_index, -1
+
+            card = generate_card_html(items[jump_index], category)
+            timeline = generate_timeline_html(items, jump_index, category)
+            return card, timeline, jump_index, -1
 
         # Connect navigation buttons
         exp_btn.click(
             lambda: update_category("experiences"),
-            outputs=[carousel_html, timeline_html, category_state, index_state],
+            outputs=[
+                carousel_html,
+                timeline_html,
+                category_state,
+                index_state,
+                timeline_jump_index,
+            ],
         )
         skills_btn.click(
             lambda: update_category("skills"),
-            outputs=[carousel_html, timeline_html, category_state, index_state],
+            outputs=[
+                carousel_html,
+                timeline_html,
+                category_state,
+                index_state,
+                timeline_jump_index,
+            ],
         )
         cert_btn.click(
             lambda: update_category("certifications"),
-            outputs=[carousel_html, timeline_html, category_state, index_state],
+            outputs=[
+                carousel_html,
+                timeline_html,
+                category_state,
+                index_state,
+                timeline_jump_index,
+            ],
         )
         edu_btn.click(
             lambda: update_category("education"),
-            outputs=[carousel_html, timeline_html, category_state, index_state],
+            outputs=[
+                carousel_html,
+                timeline_html,
+                category_state,
+                index_state,
+                timeline_jump_index,
+            ],
         )
 
         prev_btn.click(
             lambda cat, idx: navigate_carousel(-1, cat, idx),
             inputs=[category_state, index_state],
-            outputs=[carousel_html, timeline_html, index_state],
+            outputs=[carousel_html, timeline_html, index_state, timeline_jump_index],
         )
         next_btn.click(
             lambda cat, idx: navigate_carousel(1, cat, idx),
             inputs=[category_state, index_state],
-            outputs=[carousel_html, timeline_html, index_state],
+            outputs=[carousel_html, timeline_html, index_state, timeline_jump_index],
+        )
+
+        # Timeline click handler
+        timeline_jump_index.change(
+            jump_to_timeline_index,
+            inputs=[timeline_jump_index, category_state, index_state],
+            outputs=[carousel_html, timeline_html, index_state, timeline_jump_index],
         )
 
         # Chat interface
@@ -1041,7 +1144,14 @@ def create_interface():
             f"""
         <div style="margin-top: 4rem;"></div>
         <div class="chat-header">
-            <span style="font-size: 2rem;">🤖</span> Assistant IA - SmolAgent
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="{COLORS['primary']}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="10" rx="2" ry="2"></rect>
+                <circle cx="12" cy="5" r="2"></circle>
+                <path d="M12 7v4"></path>
+                <line x1="8" y1="16" x2="8" y2="16"></line>
+                <line x1="16" y1="16" x2="16" y2="16"></line>
+            </svg>
+            <span>AI Agent specialized in Clément's profile</span>
         </div>
         <p style="color: {COLORS['text_secondary']}; margin-bottom: 1.5rem; font-size: 0.95rem;">
             Posez vos questions sur le profil, les expériences GenAI, les compétences techniques ou demandez une analyse de correspondance avec vos besoins.
@@ -1052,20 +1162,31 @@ def create_interface():
         chatbot = gr.Chatbot(
             height=400,
             label="",
-            avatar_images=(None, "🤖"),
+            avatar_images=(os.path.join(logos_path, "wavebot.png"), None),
             bubble_full_width=False,
             show_label=False,
         )
 
         with gr.Row():
+            # Chat input: give the textbox an elem_id so CSS can control its height,
+            # and make the send button rectangular (elem_id=send-btn already targeted).
             msg = gr.Textbox(
                 placeholder="Ex: Quels projets multi-agents as-tu réalisés ?",
                 label="",
-                scale=9,
+                scale=10,
                 lines=1,
                 show_label=False,
+                container=True,  # keep consistent container to avoid odd sizing
+                elem_id="msg-input",  # used by the CSS above
             )
-            send_btn = gr.Button("Envoyer", variant="primary", scale=1, size="lg")
+
+            send_btn = gr.Button(
+                "➤",
+                variant="primary",
+                scale=1,
+                size="md",
+                elem_id="send-btn",  # matches CSS
+            )
 
         gr.Examples(
             examples=[
@@ -1107,4 +1228,4 @@ def create_interface():
 # Launch application
 if __name__ == "__main__":
     app = create_interface()
-    app.launch(server_name="0.0.0.0", server_port=7860, show_error=True)
+    app.launch(server_name="0.0.0.0", server_port=7860, debug=True, show_error=True)
