@@ -1,3 +1,15 @@
+---
+title: Clément's GenAI Portfolio
+emoji: 🎨
+colorFrom: green
+colorTo: gray
+sdk: gradio
+sdk_version: "3.40.0"
+app_file: app.py
+pinned: false
+---
+
+
 # Premium GenAI Portfolio - Clément Peponnet
 
 A premium portfolio showcasing GenAI and Agentic AI expertise with an elegant dark green, cream, and gray design inspired by luxury materials. Built with Gradio and powered by SmolAgent.
