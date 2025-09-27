@@ -5,16 +5,19 @@ A premium portfolio showcasing GenAI and Agentic AI expertise with an elegant da
 ## ✨ Features
 
 ### 🎨 Premium Design
-- **Luxury Color Palette**: Dark forest green, cream, and textured gray
-- **Stone-Textured Background**: Subtle linear patterns for a premium feel
-- **Apple-Inspired UX**: Smooth animations, rounded corners, elegant typography
-- **Playfair Display** font for headers, Inter for body text
+- **Luxury Color Palette**: Premium dark green (#1f4135), cream, and light gray
+- **Stone-Textured Background**: Subtle crosshatch pattern for premium feel
+- **Elegant Typography**: Playfair Display for headers, Inter for body
+- **Smooth Animations**: Refined transitions and micro-interactions
+- **Apple-Inspired UX**: Clean, spacious, and sophisticated interface
 
 ### 🚀 Interactive Components
 - **Carousel Navigation**: Browse experiences, skills, certifications, and education
-- **Interactive Timeline**: Click on timeline dots to jump to specific items
-- **Smart Navigation**: Previous/Next buttons with smooth transitions
-- **Responsive Cards**: Hover effects and detailed information display
+- **Navigation Buttons**: Large, accessible ◀ ▶ buttons aligned with content
+- **Interactive Timeline**: Visual indicator showing current position (navigate with arrows)
+- **Smart Navigation**: Category tabs for quick switching
+- **Responsive Cards**: Detailed information with smooth hover effects
+- **Icon Indicators**: Visual icons on stat cards for better scannability
 
 ### 🤖 AI-Powered Chat
 - **SmolAgent Integration**: Intelligent agent with custom tools
@@ -34,7 +37,7 @@ A premium portfolio showcasing GenAI and Agentic AI expertise with an elegant da
 ## 📁 Project Structure
 
 ```
-portfolio-genai/
+genai-portfolio/
 ├── app.py                  # Main application with both LLM options
 ├── portfolio_data.yaml     # All portfolio content (easy to update)
 ├── requirements.txt        # Python dependencies
@@ -51,7 +54,7 @@ portfolio-genai/
 ```bash
 # Clone repository
 git clone <your-repo>
-cd portfolio-genai
+cd genai-portfolio
 
 # Install dependencies
 pip install -r requirements.txt
@@ -90,15 +93,17 @@ python app.py
 ## 🎨 Color Palette
 
 ```css
-Primary: #2D5016        /* Dark forest green */
-Primary Light: #4A7C2E  /* Lighter forest green */
+Primary: #1f4135        /* Premium dark green */
+Primary Light: #2d5949  /* Lighter premium green */
 Secondary: #F5F5DC      /* Cream/Beige */
-Accent: #8FBC8F         /* Sage green */
-Background: #1A1A1A     /* Very dark gray */
-Surface: #2C2C2C        /* Dark gray surface */
-Text: #F5F5DC           /* Cream text */
-Border: #4A4A4A         /* Medium gray */
+Accent: #7fa890         /* Sage green accent */
+Background: #f8f9fa     /* Light gray background */
+Surface: #ffffff        /* White surface */
+Text: #1a1a1a          /* Dark gray text */
+Border: #dee2e6        /* Light border */
 ```
+
+The design uses a sophisticated light theme with premium dark green accents, creating a professional and luxurious appearance perfect for showcasing GenAI expertise.
 
 ## 🔧 Configuration Options
 
@@ -265,23 +270,23 @@ Edit the `COLORS` dictionary in `app.py`:
 
 ```python
 COLORS = {
-    'primary': '#2D5016',        # Your primary color
-    'secondary': '#F5F5DC',      # Your secondary color
-    'background': '#1A1A1A',     # Background color
+    'primary': '#1f4135',        # Your primary color
+    'secondary': '#F5F5DC',      # Your secondary color  
+    'background': '#f8f9fa',     # Background color
     # ... other colors
 }
 ```
 
 ### Modify Background Texture
 
-Edit the `CUSTOM_CSS` background gradient in `app.py`:
+Edit the `CUSTOM_CSS` background pattern in `app.py`:
 
 ```css
 background: 
-    linear-gradient(90deg, rgba(42, 42, 42, 0.05) 1px, transparent 1px),
-    linear-gradient(rgba(42, 42, 42, 0.05) 1px, transparent 1px),
-    linear-gradient(180deg, #1A1A1A 0%, #0f0f0f 100%);
-background-size: 60px 60px, 60px 60px, 100% 100%;
+    repeating-linear-gradient(90deg, #f8f9fa, #f8f9fa 2px, rgba(222, 226, 230, 0.3) 2px, rgba(222, 226, 230, 0.3) 3px),
+    repeating-linear-gradient(0deg, #f8f9fa, #f8f9fa 2px, rgba(222, 226, 230, 0.2) 2px, rgba(222, 226, 230, 0.2) 3px),
+    linear-gradient(180deg, #f8f9fa 0%, #f0f2f5 100%);
+background-size: 80px 80px, 80px 80px, 100% 100%;
 ```
 
 ### Add Client Logos
@@ -322,7 +327,7 @@ To use PNG logos instead of emojis:
    ```
    Type: CNAME
    Name: portfolio
-   Value: username-portfolio-genai.hf.space
+   Value: username-genai-portfolio.hf.space
    ```
 3. Wait for DNS propagation (up to 48h)
 
