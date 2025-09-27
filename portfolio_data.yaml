@@ -1,0 +1,229 @@
+# Portfolio Data Configuration
+# Update this file to add new experiences, skills, certifications, or education
+
+experiences:
+  - id: exp1
+    title: "MVP GenAI Traduction"
+    client: "Wavestone"
+    duration: "12 mois"
+    date: "2023-12"
+    period: "2024-12"
+    icon: "🌐"
+    description: >
+      Tech lead d'une équipe de 5 développeurs sur un traducteur GenAI basé sur Mistral Large 
+      via Azure AI Foundry. Développement d'une web app fullstack (ReactJS + Flask) avec 
+      architecture modulaire multi-LLMs. Présentation du MVP à l'Ex-Com et déploiement chez 
+      un grand compte du secteur du luxe.
+    technologies:
+      - Azure AI Foundry
+      - Mistral Large
+      - ReactJS
+      - Flask
+      - Docker
+      - Azure App Service
+    impact: "Industrialisation réussie chez grand compte luxe"
+    sector: "Digital Transformation"
+
+  - id: exp2
+    title: "Système Multi-Agents SentinelOne"
+    client: "Hugging Face x Gradio"
+    duration: "Hackathon"
+    date: "2025-03"
+    period: "2025-04"
+    icon: "🏆"
+    description: >
+      2e prix au Hackathon Hugging Face x Gradio dans la catégorie "AI Agents" parmi plusieurs milliers de participants et plus de 
+      600 projets internationaux. Conception d'un système multi-agents (SmolAgent + LiteLLM) 
+      pour l'analyse en continu de risques climatiques à partir de données open source 
+      (Open-Meteo, NASA FIRMS, USGS). Développement d'une interface Gradio interactive et 
+      déploiement sur Hugging Face Spaces.
+    technologies:
+      - SmolAgent
+      - LiteLLM
+      - Gradio
+      - FastMCP
+      - NASA FIRMS
+      - Open-Meteo
+    impact: "2e prix international"
+    sector: "Climate Tech"
+
+  - id: exp3
+    title: "Développement et déploiement MCP Servers"
+    client: "Confidential Transport Company"
+    duration: "4 mois"
+    date: "2025-04"
+    period: "2025-08"
+    icon: "🔧"
+    description: >
+      Tech lead et développeur sur 3 serveurs MCP (Model Context Protocol) connectés à LibreChat: 
+      Bing Search (recherche web sécurisée via Azure), Microsoft Graph (lecture/écriture M365 
+      avec génération automatisée de comptes rendus), et Python Interpreter (exécution autonome 
+      de code). Déploiement sur Azure Kubernetes (AKS) avec gestion des certificats.
+    technologies:
+      - MCP
+      - LibreChat
+      - Docker
+      - Azure AKS
+      - Microsoft Graph
+      - Python
+    impact: "MVP déployé pour +100 utilisateurs, amélioration de la productivité des utilisateurs"
+    sector: "Transport"
+
+  - id: exp4
+    title: "Dataiku Multi-Agent Workflow"
+    client: "ALSTOM"
+    duration: "4 mois"
+    date: "2025-08"
+    period: "2025-12"
+    icon: "🤖"
+    description: >
+      Conception et pilotage d'un pipeline multi-agents (12 agents) sur Dataiku LLM Mesh pour 
+      automatiser la validation de plus de 80,000 Purchase Requisitions annuelles, avec 
+      encadrement direct de 3 consultants. Allègement significatif de la charge administrative 
+      (équivalent 50 ETP) grâce à une combinaison de règles métiers et de briques GenAI.
+    technologies:
+      - Dataiku LLM Mesh
+      - Multi-Agent Systems
+      - GenAI
+      - Python
+    impact: "Amélioration du temps de traitement de 98,3%, projet vitrine COMEX"
+    sector: "Transport"
+
+  - id: exp5
+    title: "Serveur MCP Génération PowerPoint"
+    client: "Wavestone"
+    duration: "4 mois"
+    date: "2025-06"
+    period: "2025-10"
+    icon: "📊"
+    description: >
+      Tech lead d'une équipe de 5 consultants pour concevoir un produit GenAI interne de 
+      génération automatisée de slides PowerPoint (proposales, CV, références) à partir de 
+      prompts en langage naturel, basé sur un serveur MCP en Streamable-HTTP. Industrialisation 
+      avec Docker et déploiement sur Azure avec pipeline CI/CD type MCPOps incluant tests 
+      unitaires et contrôle sécurité (MCP Shield).
+    technologies:
+      - MCP
+      - Docker
+      - Azure ACR
+      - Azure App Service
+      - Copilot Studio
+      - MCP Shield
+    impact: "Déploiement pour 6000+ utilisateurs, gain en productivité"
+    sector: "Produit Interne"
+
+  - id: exp6
+    title: "PoC GenAI Analyse Enquêtes Satisfaction"
+    client: "Wavestone"
+    duration: "6 mois"
+    date: "2024-03"
+    period: "2024-06"
+    icon: "💬"
+    description: >
+      Définition des besoins métier du Chatbot et traduction en fonctionnalités techniques. 
+      Création de la base de données vectorielle (indexation BERT avec LlamaIndex), comparaison 
+      de retrievers SPARSE/DENSE pour déterminer le plus adapté au cas d'usage. Développement 
+      d'une application web Streamlit avec GPT4-32k via Azure OpenAI et mesure des performances 
+      du retriever.
+    technologies:
+      - LlamaIndex
+      - GPT-4
+      - Streamlit
+      - Azure OpenAI
+      - BERT
+      - RAG
+    impact: "PoC transformé en solution production"
+    sector: "Analytics"
+
+skills:
+  - category: "Agents & MCP"
+    icon: "🤖"
+    skills:
+      - Azure AI Agents
+      - Hugging Face SmolAgent
+      - FastMCP
+      - Gradio
+      - MCP Shield
+      - Dataiku LLM Mesh
+
+  - category: "GenAI Services & Frameworks"
+    icon: "🧠"
+    skills:
+      - Azure AI Foundry
+      - Azure AI Search
+      - Ollama / Local Models
+      - LlamaIndex
+      - LangChain
+      - LangGraph
+      - n8n
+      - Copilot Studio
+
+  - category: "Web Development"
+    icon: "💻"
+    skills:
+      - "Backend: FastAPI, Django, Flask, Streamlit"
+      - "Frontend: React"
+      - Docker
+      - Azure (AKS, ACR, App Service)
+      - CI/CD (GitLab, GitHub Actions)
+
+  - category: "Data & Machine Learning"
+    icon: "📈"
+    skills:
+      - "Python (pySpark, pandas, numpy)"
+      - "ML: scikit-learn, Regression, SVM, Random Forest, KNN"
+      - "DL: keras, tensorflow, PyTorch, CNN, Transfer Learning"
+      - "Platforms: Dataiku, Palantir Foundry"
+      - "Databases: PostgreSQL, MySQL"
+
+certifications:
+  - id: cert1
+    name: "Azure AI Engineer Associate"
+    issuer: "Microsoft"
+    year: "2024"
+    date: "2024"
+    icon: "☁️"
+    description: "Certification officielle Microsoft pour la conception et l'implémentation de solutions IA utilisant les services Azure AI."
+
+  - id: cert2
+    name: "Dataiku GenAI Practitioner"
+    issuer: "Dataiku"
+    year: "2024"
+    date: "2024"
+    icon: "📊"
+    description: "Spécialisation GenAI sur plateforme Dataiku, incluant LLM Mesh et systèmes multi-agents."
+
+  - id: cert3
+    name: "Hugging Face MCP Course"
+    issuer: "Hugging Face"
+    year: "2025"
+    date: "2025"
+    icon: "🤗"
+    description: "Formation avancée sur l'implémentation du Model Context Protocol (MCP) et les bonnes pratiques Hugging Face."
+
+education:
+  - id: edu1
+    school: "Arts & Métiers ParisTech"
+    degree: "Diplôme d'Ingénieur"
+    year: "2019"
+    date: "2019"
+    icon: "🎓"
+    achievement: "Classé 38/120, Médaille d'argent"
+    description: "Diplômé avec médaille d'argent, classé 38e sur 120 étudiants. Formation d'ingénieur généraliste avec spécialisation en informatique."
+
+  - id: edu2
+    school: "ETS Montréal"
+    degree: "Spécialisation Data Science"
+    year: "2021"
+    date: "2021"
+    icon: "🍁"
+    focus: "Machine Learning et Deep Learning"
+    description: "Spécialisation en Data Science avec focus approfondi sur les techniques de Machine Learning et Deep Learning."
+
+  - id: edu3
+    school: "Prépa PT* Jules Ferry - Versailles"
+    degree: "Classes Préparatoires"
+    year: "2017"
+    date: "2017"
+    icon: "📚"
+    description: "Classes préparatoires aux grandes écoles d'ingénieurs avec spécialisation en physique et technologie."
