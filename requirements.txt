@@ -1,0 +1,15 @@
+# Core framework
+gradio
+
+# Data handling
+pyyaml
+
+# LLM integration
+litellm==1.77.1
+
+# Optional: If you prefer using SmolAgent instead of LiteLLM
+smolagents
+huggingface_hub
+
+# Additional utilities
+python-dotenv
