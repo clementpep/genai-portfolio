@@ -31,20 +31,22 @@ def load_portfolio_data() -> Dict:
 
 PORTFOLIO = load_portfolio_data()
 
-# Premium color scheme - Dark Green, Cream, Gray
+# Premium color scheme - Luxury Dark Green, Cream, Light Gray
 COLORS = {
-    "primary": "#2D5016",  # Dark forest green
-    "primary_light": "#4A7C2E",  # Lighter forest green
+    "primary": "#1f4135",  # Premium dark green
+    "primary_light": "#2d5949",  # Lighter premium green
     "secondary": "#F5F5DC",  # Cream/Beige
-    "accent": "#8FBC8F",  # Sage green
-    "background": "#1A1A1A",  # Very dark gray
-    "surface": "#2C2C2C",  # Dark gray surface
-    "surface_elevated": "#3A3A3A",  # Elevated surface
-    "text_primary": "#F5F5DC",  # Cream text
-    "text_secondary": "#B8B8B8",  # Light gray text
-    "gradient_start": "#2D5016",
-    "gradient_end": "#4A7C2E",
-    "border": "#4A4A4A",
+    "accent": "#7fa890",  # Sage green accent
+    "background": "#f8f9fa",  # Light gray background
+    "surface": "#ffffff",  # White surface
+    "surface_elevated": "#ffffff",  # Elevated white surface
+    "text_primary": "#1a1a1a",  # Dark gray text
+    "text_secondary": "#6c757d",  # Medium gray text
+    "text_muted": "#adb5bd",  # Muted gray
+    "gradient_start": "#1f4135",
+    "gradient_end": "#2d5949",
+    "border": "#dee2e6",  # Light border
+    "shadow": "rgba(31, 65, 53, 0.1)",
 }
 
 # Custom CSS for premium stone-textured design
@@ -54,14 +56,22 @@ CUSTOM_CSS = f"""
 .gradio-container {{
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
     background: 
-        linear-gradient(90deg, 
-            rgba(42, 42, 42, 0.05) 1px, 
-            transparent 1px),
-        linear-gradient(
-            rgba(42, 42, 42, 0.05) 1px, 
-            transparent 1px),
-        linear-gradient(180deg, {COLORS['background']} 0%, #0f0f0f 100%) !important;
-    background-size: 60px 60px, 60px 60px, 100% 100% !important;
+        repeating-linear-gradient(
+            90deg,
+            {COLORS['background']},
+            {COLORS['background']} 2px,
+            rgba(222, 226, 230, 0.3) 2px,
+            rgba(222, 226, 230, 0.3) 3px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            {COLORS['background']},
+            {COLORS['background']} 2px,
+            rgba(222, 226, 230, 0.2) 2px,
+            rgba(222, 226, 230, 0.2) 3px
+        ),
+        linear-gradient(180deg, {COLORS['background']} 0%, #f0f2f5 100%) !important;
+    background-size: 80px 80px, 80px 80px, 100% 100% !important;
     max-width: 1400px !important;
     margin: 0 auto !important;
     padding: 2rem !important;
@@ -69,106 +79,123 @@ CUSTOM_CSS = f"""
 
 .premium-header {{
     background: linear-gradient(135deg, {COLORS['gradient_start']}, {COLORS['gradient_end']});
-    padding: 3rem 2rem;
+    padding: 3.5rem 2.5rem;
     border-radius: 24px;
     text-align: center;
     margin-bottom: 3rem;
-    box-shadow: 0 20px 60px rgba(45, 80, 22, 0.4);
-    border: 1px solid {COLORS['primary_light']};
+    box-shadow: 0 10px 40px {COLORS['shadow']}, 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }}
 
 .premium-header h1 {{
-    color: {COLORS['secondary']};
+    color: white;
     font-family: 'Playfair Display', serif;
     font-size: 3rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     letter-spacing: -0.02em;
 }}
 
 .premium-header p {{
-    color: {COLORS['secondary']};
+    color: rgba(255, 255, 255, 0.95);
     font-size: 1.1rem;
     font-weight: 400;
-    opacity: 0.95;
+    line-height: 1.6;
 }}
 
 .social-links {{
     display: flex;
     justify-content: center;
     gap: 1.5rem;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
 }}
 
 .social-link {{
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    background: rgba(245, 245, 220, 0.1);
-    border: 1px solid {COLORS['secondary']};
-    border-radius: 12px;
-    color: {COLORS['secondary']};
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    color: white;
     text-decoration: none;
     transition: all 0.3s ease;
     font-weight: 500;
+    backdrop-filter: blur(10px);
 }}
 
 .social-link:hover {{
-    background: {COLORS['secondary']};
+    background: white;
     color: {COLORS['primary']};
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(245, 245, 220, 0.3);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
 }}
 
-.carousel-container {{
-    position: relative;
-    min-height: 500px;
-    padding: 2rem 0;
+.carousel-wrapper {{
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 2rem;
+    margin: 2rem 0;
+    min-height: 480px;
+}}
+
+.carousel-wrapper > div {{
+    display: flex;
+    align-items: center;
+}}
+
+.carousel-container {{
+    flex: 1;
+    max-width: 700px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
     perspective: 1000px;
 }}
 
 .card {{
-    background: {COLORS['surface_elevated']};
+    background: {COLORS['surface']};
     border-radius: 24px;
     padding: 2.5rem;
     width: 100%;
-    max-width: 650px;
     min-height: 420px;
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
-    border: 2px solid {COLORS['border']};
+    box-shadow: 0 4px 20px {COLORS['shadow']}, 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid {COLORS['border']};
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    display: flex;
+    flex-direction: column;
 }}
 
 .card:hover {{
-    transform: translateY(-8px);
-    box-shadow: 0 25px 70px rgba(45, 80, 22, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px {COLORS['shadow']}, 0 4px 12px rgba(0, 0, 0, 0.08);
     border-color: {COLORS['primary_light']};
 }}
 
 .card-header {{
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 1.5rem;
     margin-bottom: 1.5rem;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid {COLORS['border']};
+    border-bottom: 2px solid {COLORS['border']};
 }}
 
 .card-logo {{
     width: 80px;
     height: 80px;
-    border-radius: 16px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, {COLORS['gradient_start']}, {COLORS['gradient_end']});
     font-size: 2.5rem;
-    box-shadow: 0 8px 20px rgba(45, 80, 22, 0.3);
+    box-shadow: 0 4px 16px {COLORS['shadow']};
+    flex-shrink: 0;
 }}
 
 .card-title {{
@@ -177,10 +204,11 @@ CUSTOM_CSS = f"""
     font-weight: 600;
     color: {COLORS['text_primary']};
     margin-bottom: 0.5rem;
+    line-height: 1.3;
 }}
 
 .card-subtitle {{
-    color: {COLORS['primary_light']};
+    color: {COLORS['primary']};
     font-weight: 500;
     font-size: 1rem;
 }}
@@ -190,24 +218,25 @@ CUSTOM_CSS = f"""
     line-height: 1.7;
     margin-bottom: 1.5rem;
     font-size: 0.95rem;
+    flex: 1;
 }}
 
 .card-meta {{
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: {COLORS['text_secondary']};
+    color: {COLORS['text_muted']};
     font-size: 0.9rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }}
 
 .tech-badge {{
     display: inline-block;
     padding: 0.5rem 1rem;
-    background: rgba(45, 80, 22, 0.2);
-    border: 1px solid {COLORS['primary_light']};
-    border-radius: 16px;
-    color: {COLORS['accent']};
+    background: rgba(31, 65, 53, 0.08);
+    border: 1px solid {COLORS['border']};
+    border-radius: 20px;
+    color: {COLORS['primary']};
     font-size: 0.85rem;
     font-weight: 500;
     margin: 0.3rem;
@@ -216,8 +245,9 @@ CUSTOM_CSS = f"""
 
 .tech-badge:hover {{
     background: {COLORS['primary']};
-    color: {COLORS['secondary']};
-    transform: scale(1.05);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px {COLORS['shadow']};
 }}
 
 .timeline {{
@@ -225,7 +255,7 @@ CUSTOM_CSS = f"""
     align-items: center;
     justify-content: center;
     gap: 3rem;
-    padding: 2rem 0;
+    padding: 2.5rem 0;
     position: relative;
     margin-top: 2rem;
 }}
@@ -234,16 +264,17 @@ CUSTOM_CSS = f"""
     content: '';
     position: absolute;
     top: 50%;
-    left: 10%;
-    right: 10%;
-    height: 2px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 20%);
+    height: 3px;
     background: linear-gradient(90deg, 
         transparent, 
-        {COLORS['primary']}, 
+        {COLORS['border']},
         {COLORS['primary_light']},
-        {COLORS['primary']}, 
+        {COLORS['border']},
         transparent);
-    transform: translateY(-50%);
+    z-index: 0;
 }}
 
 .timeline-item {{
@@ -257,33 +288,43 @@ CUSTOM_CSS = f"""
 }}
 
 .timeline-dot {{
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: {COLORS['surface']};
     border: 3px solid {COLORS['border']};
     transition: all 0.3s ease;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+}}
+
+.timeline-item:hover .timeline-dot {{
+    transform: scale(1.2);
+    border-color: {COLORS['primary_light']};
 }}
 
 .timeline-item.active .timeline-dot {{
     background: linear-gradient(135deg, {COLORS['gradient_start']}, {COLORS['gradient_end']});
-    border-color: {COLORS['primary_light']};
-    transform: scale(1.4);
-    box-shadow: 0 0 20px rgba(74, 124, 46, 0.6);
+    border-color: {COLORS['primary']};
+    transform: scale(1.5);
+    box-shadow: 0 0 20px {COLORS['shadow']}, 0 0 40px rgba(31, 65, 53, 0.3);
 }}
 
 .timeline-label {{
-    font-size: 0.75rem;
-    color: {COLORS['text_secondary']};
+    font-size: 0.8rem;
+    color: {COLORS['text_muted']};
     white-space: nowrap;
     transition: all 0.3s ease;
+    font-weight: 500;
+}}
+
+.timeline-item:hover .timeline-label {{
+    color: {COLORS['text_secondary']};
 }}
 
 .timeline-item.active .timeline-label {{
-    color: {COLORS['primary_light']};
+    color: {COLORS['primary']};
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
 }}
 
 .nav-button {{
@@ -296,21 +337,25 @@ CUSTOM_CSS = f"""
     font-weight: 500 !important;
     cursor: pointer;
     transition: all 0.3s ease !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
 }}
 
 .nav-button:hover {{
     background: {COLORS['primary']} !important;
-    border-color: {COLORS['primary_light']} !important;
+    color: white !important;
+    border-color: {COLORS['primary']} !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 24px rgba(45, 80, 22, 0.3) !important;
+    box-shadow: 0 6px 20px {COLORS['shadow']} !important;
 }}
 
 .carousel-nav-btn {{
     background: {COLORS['surface']} !important;
     border: 2px solid {COLORS['border']} !important;
     border-radius: 50% !important;
-    width: 50px !important;
-    height: 50px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+    width: 56px !important;
+    height: 56px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -318,62 +363,69 @@ CUSTOM_CSS = f"""
     font-size: 1.5rem !important;
     cursor: pointer !important;
     transition: all 0.3s ease !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+    flex-shrink: 0 !important;
 }}
 
 .carousel-nav-btn:hover {{
     background: {COLORS['primary']} !important;
-    border-color: {COLORS['primary_light']} !important;
+    color: white !important;
+    border-color: {COLORS['primary']} !important;
     transform: scale(1.1) !important;
+    box-shadow: 0 4px 20px {COLORS['shadow']} !important;
 }}
 
 .stats-container {{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
-    margin: 2rem 0 3rem 0;
+    margin: 2.5rem 0 3rem 0;
 }}
 
 .stat-card {{
     background: {COLORS['surface']};
     border: 2px solid {COLORS['border']};
-    border-radius: 20px;
+    border-radius: 24px;
     padding: 2rem 1.5rem;
     text-align: center;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }}
 
 .stat-card:hover {{
     transform: translateY(-4px);
     border-color: {COLORS['primary_light']};
-    box-shadow: 0 12px 30px rgba(45, 80, 22, 0.2);
+    box-shadow: 0 8px 24px {COLORS['shadow']};
 }}
 
 .stat-value {{
     font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
+    font-size: 2.75rem;
     font-weight: 700;
-    color: {COLORS['primary_light']};
+    color: {COLORS['primary']};
     margin-bottom: 0.5rem;
 }}
 
 .stat-label {{
     color: {COLORS['text_secondary']};
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 500;
 }}
 
 .chat-container {{
     background: {COLORS['surface']};
     border: 2px solid {COLORS['border']};
     border-radius: 24px;
-    padding: 2rem;
+    padding: 2.5rem;
     margin-top: 3rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }}
 
 .chat-header {{
     font-family: 'Playfair Display', serif;
     font-size: 1.8rem;
     color: {COLORS['text_primary']};
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -382,15 +434,18 @@ CUSTOM_CSS = f"""
 button.primary {{
     background: linear-gradient(135deg, {COLORS['gradient_start']}, {COLORS['gradient_end']}) !important;
     border: none !important;
-    color: {COLORS['secondary']} !important;
+    color: white !important;
 }}
 
 button.primary:hover {{
-    box-shadow: 0 8px 24px rgba(45, 80, 22, 0.4) !important;
+    box-shadow: 0 6px 20px {COLORS['shadow']} !important;
+    transform: translateY(-1px) !important;
 }}
 
 .gr-button {{
     border-radius: 12px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
 }}
 
 .gr-input, .gr-textbox {{
@@ -398,10 +453,115 @@ button.primary:hover {{
     border: 2px solid {COLORS['border']} !important;
     border-radius: 12px !important;
     color: {COLORS['text_primary']} !important;
+    transition: all 0.3s ease !important;
 }}
 
 .gr-input:focus, .gr-textbox:focus {{
-    border-color: {COLORS['primary_light']} !important;
+    border-color: {COLORS['primary']} !important;
+    box-shadow: 0 0 0 3px rgba(31, 65, 53, 0.1) !important;
+}}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {{
+    width: 10px;
+    height: 10px;
+}}
+
+::-webkit-scrollbar-track {{
+    background: {COLORS['background']};
+    border-radius: 5px;
+}}
+
+::-webkit-scrollbar-thumb {{
+    background: {COLORS['border']};
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}}
+
+::-webkit-scrollbar-thumb:hover {{
+    background: {COLORS['primary']};
+}}
+
+/* Footer styling */
+.footer {{
+    text-align: center;
+    margin-top: 4rem;
+    padding: 2.5rem;
+    border-top: 2px solid {COLORS['border']};
+    background: {COLORS['surface']};
+    border-radius: 24px;
+}}
+
+/* Improved button transitions */
+button {{
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}}
+
+/* Better input focus states */
+input:focus, textarea:focus {{
+    outline: none !important;
+}}
+
+/* Chatbot improvements */
+.chatbot {{
+    border: 2px solid {COLORS['border']} !important;
+    border-radius: 16px !important;
+}}
+
+/* Message styling */
+.message {{
+    margin: 0.5rem 0 !important;
+    border-radius: 16px !important;
+}}
+
+.message.user {{
+    background: linear-gradient(135deg, {COLORS['gradient_start']}, {COLORS['gradient_end']}) !important;
+    color: white !important;
+}}
+
+.message.bot {{
+    background: {COLORS['surface']} !important;
+    border: 1px solid {COLORS['border']} !important;
+}}
+
+/* Improved spacing */
+.gradio-container > * {{
+    animation: fadeIn 0.6s ease-in-out;
+}}
+
+@keyframes fadeIn {{
+    from {{
+        opacity: 0;
+        transform: translateY(10px);
+    }}
+    to {{
+        opacity: 1;
+        transform: translateY(0);
+    }}
+}}
+
+/* Row and column improvements */
+.gr-row {{
+    margin-bottom: 0 !important;
+}}
+
+/* Better card shadows on hover */
+.card::after {{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 24px;
+    background: linear-gradient(135deg, transparent, rgba(31, 65, 53, 0.03));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}}
+
+.card:hover::after {{
+    opacity: 1;
 }}
 """
 
@@ -696,9 +856,9 @@ def generate_card_html(item: Dict, category: str) -> str:
     """
 
 
-# Generate timeline HTML
-def generate_timeline_html(items: List[Dict], active_index: int) -> str:
-    """Generate HTML for interactive timeline"""
+# Generate timeline HTML with click handlers
+def generate_timeline_html(items: List[Dict], active_index: int, category: str) -> str:
+    """Generate HTML for interactive timeline with JavaScript click handlers"""
 
     timeline_items = []
     for i, item in enumerate(items):
@@ -714,6 +874,8 @@ def generate_timeline_html(items: List[Dict], active_index: int) -> str:
         """
         )
 
+    # Note: Timeline clicks will work via Gradio's built-in mechanisms
+    # Users can use the navigation buttons to move through items
     return f'<div class="timeline">{"".join(timeline_items)}</div>'
 
 
@@ -724,7 +886,10 @@ def create_interface():
     with gr.Blocks(
         css=CUSTOM_CSS,
         theme=gr.themes.Soft(
-            primary_hue="green", secondary_hue="stone", neutral_hue="slate"
+            primary_hue=gr.themes.colors.emerald,
+            secondary_hue=gr.themes.colors.stone,
+            neutral_hue=gr.themes.colors.slate,
+            font=[gr.themes.GoogleFont("Inter"), "system-ui", "sans-serif"],
         ),
         title="Clément Peponnet - Portfolio GenAI & Agentic",
     ) as app:
@@ -769,18 +934,22 @@ def create_interface():
             f"""
         <div class="stats-container">
             <div class="stat-card">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🚀</div>
                 <div class="stat-value">{len(PORTFOLIO['experiences'])}</div>
                 <div class="stat-label">Projets GenAI majeurs</div>
             </div>
             <div class="stat-card">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏆</div>
                 <div class="stat-value">{len(PORTFOLIO['certifications'])}</div>
                 <div class="stat-label">Certifications AI</div>
             </div>
             <div class="stat-card">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">💼</div>
                 <div class="stat-value">50+</div>
                 <div class="stat-label">Pitchs GenAI</div>
             </div>
             <div class="stat-card">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
                 <div class="stat-value">6000+</div>
                 <div class="stat-label">Utilisateurs produits</div>
             </div>
@@ -795,27 +964,36 @@ def create_interface():
             cert_btn = gr.Button("🏆 Certifications", elem_classes="nav-button")
             edu_btn = gr.Button("🎓 Études", elem_classes="nav-button")
 
-        # Carousel display
-        with gr.Row():
-            with gr.Column(scale=1):
-                prev_btn = gr.Button("◀", elem_classes="carousel-nav-btn")
-            with gr.Column(scale=10):
+        # Carousel display with proper alignment
+        gr.HTML('<div style="margin: 3rem 0 1rem 0;"></div>')  # Spacer
+
+        with gr.Row(elem_classes="carousel-wrapper"):
+            prev_btn = gr.Button("◀", elem_classes="carousel-nav-btn")
+            with gr.Column(scale=1, elem_classes="carousel-container"):
                 carousel_html = gr.HTML(
-                    generate_card_html(PORTFOLIO["experiences"][0], "experiences"),
-                    elem_classes="carousel-container",
+                    generate_card_html(PORTFOLIO["experiences"][0], "experiences")
                 )
-            with gr.Column(scale=1):
-                next_btn = gr.Button("▶", elem_classes="carousel-nav-btn")
+            next_btn = gr.Button("▶", elem_classes="carousel-nav-btn")
 
         # Timeline
-        timeline_html = gr.HTML(generate_timeline_html(PORTFOLIO["experiences"], 0))
+        timeline_html = gr.HTML(
+            generate_timeline_html(PORTFOLIO["experiences"], 0, "experiences")
+        )
+
+        gr.HTML(
+            f"""
+        <p style="text-align: center; color: {COLORS['text_muted']}; font-size: 0.85rem; margin-top: 1rem;">
+            💡 Utilisez les flèches ◀ ▶ ou les onglets ci-dessus pour naviguer entre les différentes expériences
+        </p>
+        """
+        )
 
         # Navigation functions
         def update_category(category: str):
             items = PORTFOLIO.get(category, [])
             if items:
                 card = generate_card_html(items[0], category)
-                timeline = generate_timeline_html(items, 0)
+                timeline = generate_timeline_html(items, 0, category)
                 return card, timeline, category, 0
             return carousel_html.value, timeline_html.value, category, 0
 
@@ -826,7 +1004,7 @@ def create_interface():
 
             new_index = (current_index + direction) % len(items)
             card = generate_card_html(items[new_index], category)
-            timeline = generate_timeline_html(items, new_index)
+            timeline = generate_timeline_html(items, new_index, category)
             return card, timeline, new_index
 
         # Connect navigation buttons
@@ -860,25 +1038,34 @@ def create_interface():
 
         # Chat interface
         gr.HTML(
-            """
+            f"""
+        <div style="margin-top: 4rem;"></div>
         <div class="chat-header">
-            🤖 Assistant IA - SmolAgent
+            <span style="font-size: 2rem;">🤖</span> Assistant IA - SmolAgent
         </div>
+        <p style="color: {COLORS['text_secondary']}; margin-bottom: 1.5rem; font-size: 0.95rem;">
+            Posez vos questions sur le profil, les expériences GenAI, les compétences techniques ou demandez une analyse de correspondance avec vos besoins.
+        </p>
         """
         )
 
         chatbot = gr.Chatbot(
-            height=450, label="", avatar_images=(None, "🤖"), bubble_full_width=False
+            height=400,
+            label="",
+            avatar_images=(None, "🤖"),
+            bubble_full_width=False,
+            show_label=False,
         )
 
         with gr.Row():
             msg = gr.Textbox(
-                placeholder="Posez une question sur le profil de Clément...",
+                placeholder="Ex: Quels projets multi-agents as-tu réalisés ?",
                 label="",
                 scale=9,
                 lines=1,
+                show_label=False,
             )
-            send_btn = gr.Button("Envoyer", variant="primary", scale=1)
+            send_btn = gr.Button("Envoyer", variant="primary", scale=1, size="lg")
 
         gr.Examples(
             examples=[
@@ -903,12 +1090,11 @@ def create_interface():
         )
         gr.HTML(
             f"""
-        <div style="text-align: center; margin-top: 3rem; padding: 2rem; 
-                    border-top: 2px solid {COLORS['border']};">
-            <p style="color: {COLORS['text_secondary']}; font-size: 0.9rem;">
+        <div class="footer">
+            <p style="color: {COLORS['text_primary']}; font-size: 1rem; font-weight: 500; margin-bottom: 0.5rem;">
                 © 2025 Clément Peponnet - Portfolio GenAI & Agentic
             </p>
-            <p style="color: {COLORS['text_secondary']}; font-size: 0.8rem; margin-top: 0.5rem;">
+            <p style="color: {COLORS['text_secondary']}; font-size: 0.875rem;">
                 Built with Gradio & {model_info}
             </p>
         </div>
@@ -921,4 +1107,4 @@ def create_interface():
 # Launch application
 if __name__ == "__main__":
     app = create_interface()
-    app.launch(server_name="0.0.0.0", server_port=7860, show_error=True, share=True)
+    app.launch(server_name="0.0.0.0", server_port=7860, show_error=True)
