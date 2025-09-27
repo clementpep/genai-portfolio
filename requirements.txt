@@ -1,15 +1,18 @@
 # Core framework
-gradio
+gradio>=4.0.0
 
 # Data handling
-pyyaml
+pyyaml>=6.0
 
-# LLM integration
+# Environment variables
+python-dotenv>=1.0.0
+
+# SmolAgent (Hugging Face) - for FREE option
+smolagents>=0.1.0
+huggingface_hub>=0.20.0
+
+# LiteLLM - for PAID option (OpenAI, Claude, Azure, etc.)
 litellm==1.77.1
 
-# Optional: If you prefer using SmolAgent instead of LiteLLM
-smolagents
-huggingface_hub
-
-# Additional utilities
-python-dotenv
+# Optional: for better chat formatting
+markdown>=3.5.0

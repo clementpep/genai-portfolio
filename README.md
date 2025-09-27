@@ -1,88 +1,144 @@
-# Clément's GenAI Portfolio - Hugging Face Space
+# Premium GenAI Portfolio - Clément Peponnet
 
-Portfolio showcasing GenAI and Agentic AI expertise, built with Gradio and deployed on Hugging Face Spaces.
+A premium portfolio showcasing GenAI and Agentic AI expertise with an elegant dark green, cream, and gray design inspired by luxury materials. Built with Gradio and powered by SmolAgent.
 
-## Features
+## ✨ Features
 
-- **Interactive Carousel**: Navigate through experiences, skills, certifications, and education
-- **Timeline Navigation**: Visual timeline with clickable dots for quick navigation
-- **AI Chatbot**: Powered by LiteLLM with GPT-4o-mini for intelligent portfolio queries
-- **Easy Updates**: All content managed through a single YAML configuration file
-- **Responsive Layout**: Optimized for all screen sizes
+### 🎨 Premium Design
+- **Luxury Color Palette**: Dark forest green, cream, and textured gray
+- **Stone-Textured Background**: Subtle linear patterns for a premium feel
+- **Apple-Inspired UX**: Smooth animations, rounded corners, elegant typography
+- **Playfair Display** font for headers, Inter for body text
 
-## Project Structure
+### 🚀 Interactive Components
+- **Carousel Navigation**: Browse experiences, skills, certifications, and education
+- **Interactive Timeline**: Click on timeline dots to jump to specific items
+- **Smart Navigation**: Previous/Next buttons with smooth transitions
+- **Responsive Cards**: Hover effects and detailed information display
+
+### 🤖 AI-Powered Chat
+- **SmolAgent Integration**: Intelligent agent with custom tools
+- **Dual LLM Support**: Choose between free HuggingFace or paid OpenAI/Claude
+- **Custom Tools**:
+  - `list_clement_experiences` - Filter experiences by technology, client, or sector
+  - `list_clement_skills` - Get skills by category
+  - `list_clement_certifications` - View all certifications
+  - `list_clement_education` - Educational background
+  - `analyze_profile_match` - Match profile against job requirements
+
+### 🔗 Social Integration
+- LinkedIn profile with custom icon
+- GitHub profile with custom icon
+- Clean, professional footer
+
+## 📁 Project Structure
 
 ```
-genai-portfolio/
-├── app.py                  # Main Gradio application
-├── portfolio_data.yaml     # Portfolio content (experiences, skills, etc.)
+portfolio-genai/
+├── app.py                  # Main application with both LLM options
+├── portfolio_data.yaml     # All portfolio content (easy to update)
 ├── requirements.txt        # Python dependencies
-├── README.md               # This file
-└── .env                    # Environment variables (API keys)
+├── .env                   # Environment configuration (create from .env.example)
+├── .env.example           # Template for environment variables
+├── README.md              # This file
+└── DEPLOYMENT.md          # Deployment guide
 ```
 
-## Setup Instructions
+## 🚀 Quick Start
 
-### Local Development
+### 1. Local Development
 
-1. **Clone the repository**
-   ```bash
-   git clone <your-repo-url>
-   cd genai-portfoli
+```bash
+# Clone repository
+git clone <your-repo>
+cd portfolio-genai
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment (choose one option)
+cp .env.example .env
+
+# Option A: FREE - Use Hugging Face (recommended for testing)
+echo "USE_HF_MODEL=true" >> .env
+echo "HF_TOKEN=hf_your_token" >> .env
+
+# Option B: PAID - Use OpenAI
+echo "USE_HF_MODEL=false" >> .env
+echo "OPENAI_API_KEY=sk-proj-your-key" >> .env
+
+# Run application
+python app.py
+```
+
+### 2. Hugging Face Spaces Deployment
+
+1. **Create Space**: https://huggingface.co/new-space
+   - SDK: Gradio
+   - Hardware: CPU basic (free)
+
+2. **Upload files**: `app.py`, `portfolio_data.yaml`, `requirements.txt`
+
+3. **Configure secrets** (Settings → Variables and secrets):
+   ```
+   USE_HF_MODEL=true
+   HF_TOKEN=hf_your_token_here
    ```
 
-2. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+4. **Deploy**: Space builds automatically
 
-3. **Configure environment variables**
-   Create a `.env` file:
-   ```bash
-   # Required for LiteLLM chatbot
-   OPENAI_API_KEY=your_openai_api_key_here
-   
-   # Or use Azure OpenAI
-   AZURE_API_KEY=your_azure_key
-   AZURE_API_BASE=https://your-resource.openai.azure.com/
-   AZURE_API_VERSION=2024-02-15-preview
-   ```
+## 🎨 Color Palette
 
-4. **Run the application**
-   ```bash
-   python app.py
-   ```
+```css
+Primary: #2D5016        /* Dark forest green */
+Primary Light: #4A7C2E  /* Lighter forest green */
+Secondary: #F5F5DC      /* Cream/Beige */
+Accent: #8FBC8F         /* Sage green */
+Background: #1A1A1A     /* Very dark gray */
+Surface: #2C2C2C        /* Dark gray surface */
+Text: #F5F5DC           /* Cream text */
+Border: #4A4A4A         /* Medium gray */
+```
 
-5. **Open in browser**
-   Navigate to `http://localhost:7860`
+## 🔧 Configuration Options
 
-### Hugging Face Space Deployment
+### LLM Backend Selection
 
-1. **Create a new Space**
-   - Go to https://huggingface.co/spaces
-   - Click "Create new Space"
-   - Choose "Gradio" as the SDK
-   - Select your preferred hardware (CPU is sufficient)
+The app supports two LLM backends via the `USE_HF_MODEL` environment variable:
 
-2. **Upload files**
-   - Upload `app.py`, `portfolio_data.yaml`, and `requirements.txt`
-   - The Space will automatically detect and run the Gradio app
+#### Option 1: Hugging Face (FREE)
+```bash
+USE_HF_MODEL=true
+HF_TOKEN=hf_your_token
+```
+- ✅ Free to use
+- ✅ SmolAgent with tool calling
+- ✅ Qwen2.5-Coder-32B-Instruct model
+- ⚠️ May be slower on CPU
 
-3. **Configure secrets**
-   - Go to Space Settings > Variables and secrets
-   - Add your API key as a secret:
-     - Name: `OPENAI_API_KEY`
-     - Value: Your OpenAI API key
+#### Option 2: LiteLLM (PAID)
+```bash
+USE_HF_MODEL=false
+OPENAI_API_KEY=sk-proj-your-key
+LITELLM_MODEL=gpt-4o-mini
+```
+- ✅ Faster responses
+- ✅ Better quality
+- ✅ Multiple providers (OpenAI, Claude, Azure)
+- ⚠️ Requires API credits
 
-4. **Deploy**
-   - The Space will automatically build and deploy
-   - Your portfolio will be live at `https://huggingface.co/spaces/<username>/<space-name>`
+### Supported LLM Providers (via LiteLLM)
 
-## Updating Your Portfolio
+- **OpenAI**: `gpt-4o-mini`, `gpt-4o`, `gpt-4-turbo`
+- **Anthropic**: `claude-3-5-sonnet-20241022`, `claude-3-opus-20240229`
+- **Azure OpenAI**: `azure/your-deployment-name`
+- **100+ other providers**: See [LiteLLM docs](https://docs.litellm.ai/docs/providers)
 
-All portfolio content is managed in `portfolio_data.yaml`. Simply edit this file to update your portfolio.
+## 📝 Updating Your Portfolio
 
-### Adding a New Experience
+All content is managed in `portfolio_data.yaml`. Simply edit this file to update your portfolio:
+
+### Add New Experience
 
 ```yaml
 experiences:
@@ -90,25 +146,23 @@ experiences:
     title: "New Project Title"
     client: "Client Name"
     duration: "3 months"
-    date: "2025-01"
-    period: "2025-01"
-    icon: "🚀"
+    date: "2025-03"
+    period: "2025-03"
+    icon: "🚀"  # Use emoji or provide PNG logo
     description: >
-      Detailed description of the project, your role, 
-      and key achievements.
+      Detailed description of the project...
     technologies:
       - Technology 1
       - Technology 2
-      - Technology 3
-    impact: "Key business impact or result"
+    impact: "Key business impact"
     sector: "Industry sector"
 ```
 
-### Adding a New Skill Category
+### Add New Skill Category
 
 ```yaml
 skills:
-  - category: "New Skill Category"
+  - category: "New Category"
     icon: "💡"
     skills:
       - Skill 1
@@ -116,7 +170,7 @@ skills:
       - Skill 3
 ```
 
-### Adding a Certification
+### Add Certification
 
 ```yaml
 certifications:
@@ -126,138 +180,184 @@ certifications:
     year: "2025"
     date: "2025"
     icon: "🏆"
-    description: "Brief description of the certification."
+    description: "Brief description"
 ```
 
-### Adding Education
+## 🎯 SmolAgent Tools
 
-```yaml
-education:
-  - id: edu_new
-    school: "University Name"
-    degree: "Degree Title"
-    year: "2025"
-    date: "2025"
-    icon: "🎓"
-    achievement: "Honors, rankings, or special achievements"
-    description: "Description of the program and specialization."
-```
+The AI assistant uses custom tools to query your portfolio:
 
-## Customization
+### Available Tools
 
-### Colors and Theme
+1. **`list_clement_experiences`**
+   ```python
+   # Filter experiences by technology, client, or sector
+   "Show me projects using MCP"
+   "What work has been done for Wavestone?"
+   ```
+
+2. **`list_clement_skills`**
+   ```python
+   # Get skills by category
+   "What are the GenAI skills?"
+   "Show me web development expertise"
+   ```
+
+3. **`list_clement_certifications`**
+   ```python
+   # List all certifications
+   "What certifications does Clément have?"
+   ```
+
+4. **`list_clement_education`**
+   ```python
+   # Get educational background
+   "Tell me about the education"
+   ```
+
+5. **`analyze_profile_match`**
+   ```python
+   # Analyze match with job requirements
+   "Analyze match for: Senior GenAI Engineer with Azure and multi-agent experience"
+   ```
+
+## 🐛 Troubleshooting
+
+### Chat Not Working
+
+**Issue**: Chat returns errors or doesn't respond
+
+**Solutions**:
+1. Check your API key/token is correctly set
+2. Verify `USE_HF_MODEL` matches your configuration
+3. Check Space logs for specific errors
+4. Try switching between HF and LiteLLM backends
+
+### Carousel Navigation Issues
+
+**Issue**: Cards don't update when clicking buttons
+
+**Solutions**:
+1. Verify `portfolio_data.yaml` is properly formatted
+2. Check browser console for JavaScript errors
+3. Clear browser cache and reload
+
+### Timeline Not Clickable
+
+**Issue**: Timeline dots don't respond to clicks
+
+**Note**: Currently timeline is visual-only. Use Previous/Next buttons or category tabs for navigation. Timeline shows current position.
+
+### Styling Issues
+
+**Issue**: Colors or layout look wrong
+
+**Solutions**:
+1. Hard refresh browser (Ctrl+F5)
+2. Check if custom CSS loaded (view page source)
+3. Verify Gradio version >= 4.0.0
+
+## 🎨 Customization
+
+### Change Color Palette
 
 Edit the `COLORS` dictionary in `app.py`:
 
 ```python
 COLORS = {
-    'primary': '#007AFF',        # Primary accent color
-    'secondary': '#5856D6',      # Secondary accent color
-    'background': '#000000',     # Main background
-    'surface': '#1C1C1E',        # Card background
+    'primary': '#2D5016',        # Your primary color
+    'secondary': '#F5F5DC',      # Your secondary color
+    'background': '#1A1A1A',     # Background color
     # ... other colors
 }
 ```
 
-### Chatbot Model
+### Modify Background Texture
 
-To use a different LLM model, modify the `chat_with_ai` function:
+Edit the `CUSTOM_CSS` background gradient in `app.py`:
+
+```css
+background: 
+    linear-gradient(90deg, rgba(42, 42, 42, 0.05) 1px, transparent 1px),
+    linear-gradient(rgba(42, 42, 42, 0.05) 1px, transparent 1px),
+    linear-gradient(180deg, #1A1A1A 0%, #0f0f0f 100%);
+background-size: 60px 60px, 60px 60px, 100% 100%;
+```
+
+### Add Client Logos
+
+To use PNG logos instead of emojis:
+
+1. Add logo files to a `/logos` folder
+2. Update `icon` in `portfolio_data.yaml`:
+   ```yaml
+   icon: "logos/wavestone.png"
+   ```
+3. Modify `generate_card_html()` to handle image paths
+
+## 📊 Performance Tips
+
+### For Free Tier (CPU)
+- Use `USE_HF_MODEL=true` (HuggingFace)
+- Keep conversations short
+- Limit max_tokens in agent configuration
+
+### For Better Performance
+- Upgrade to CPU upgrade ($0.03/hour)
+- Use GPU for faster inference
+- Use LiteLLM with GPT-4o-mini
+
+## 🔒 Security
+
+- ✅ Never commit `.env` file
+- ✅ Use Spaces secrets for sensitive data
+- ✅ Validate YAML input when updating portfolio
+- ✅ Keep dependencies updated
+- ✅ Review Space logs regularly
+
+## 🌐 Adding Custom Domain
+
+1. Purchase domain (Namecheap, GoDaddy, etc.)
+2. Add CNAME record:
+   ```
+   Type: CNAME
+   Name: portfolio
+   Value: username-portfolio-genai.hf.space
+   ```
+3. Wait for DNS propagation (up to 48h)
+
+## 📈 Analytics
+
+Enable Gradio analytics in `app.py`:
 
 ```python
-# Use Claude instead of GPT-4o-mini
-response = completion(
-    model="claude-3-5-sonnet-20241022",  # or any other model
-    messages=messages,
-    temperature=0.7,
-    max_tokens=500
+app.launch(
+    analytics_enabled=True,
+    show_api=False
 )
 ```
 
-**Supported models** (via LiteLLM):
-- OpenAI: `gpt-4o-mini`, `gpt-4o`, `gpt-4-turbo`
-- Anthropic: `claude-3-5-sonnet-20241022`, `claude-3-opus-20240229`
-- Azure OpenAI: `azure/your-deployment-name`
-- And 100+ other providers
+Monitor in Space → Analytics tab
 
-### Alternative: Using SmolAgent
+## 🤝 Contributing
 
-To use SmolAgent instead of LiteLLM:
-
-1. Update `requirements.txt`:
-   ```
-   smolagents
-   huggingface_hub
-   ```
-
-2. Replace the chat function in `app.py`:
-   ```python
-   from smolagents import CodeAgent, InferenceClientModel
-   
-   model = InferenceClientModel(model_id="Qwen/Qwen2.5-Coder-32B-Instruct")
-   agent = CodeAgent(model=model, tools=[...])
-   
-   def chat_with_ai(message, history):
-       result = agent.run(message)
-       return str(result)
-   ```
-
-## Design Philosophy
-
-This portfolio follows Apple's design principles:
-
-- **Simplicity**: Clean, uncluttered interface
-- **Clarity**: Clear visual hierarchy and typography
-- **Depth**: Layered design with shadows and gradients
-- **Consistency**: Unified color scheme and spacing
-- **Animation**: Smooth, purposeful transitions
-
-## Troubleshooting
-
-### Chat not working
-- Verify your API key is correctly set in environment variables
-- Check the Space logs for error messages
-- Ensure your API key has sufficient credits
-
-### Carousel not displaying correctly
-- Clear browser cache
-- Check that `portfolio_data.yaml` is properly formatted
-- Verify all required fields are present in each item
-
-### Timeline not updating
-- Ensure JavaScript is enabled in your browser
-- Check browser console for errors
-- Verify the timeline items have valid dates
-
-## Performance Optimization
-
-For better performance on Hugging Face Spaces:
-
-1. **Use CPU hardware**: The application is optimized for CPU inference
-2. **Limit chat history**: Truncate old messages to reduce token usage
-3. **Optimize images**: Use compressed images for better loading times
-4. **Cache responses**: Implement caching for repeated queries
-
-## Contributing
-
-To contribute to this project:
+To contribute improvements:
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create feature branch
+3. Test changes locally
+4. Submit pull request
 
-## License
+## 📞 Support
+
+- **LinkedIn**: [Clément Peponnet](https://www.linkedin.com/in/clément-peponnet-b26906194)
+- **GitHub**: [@clemenpep](https://github.com/clementpep)
+- **Issues**: Open an issue on GitHub
+
+## 📄 License
 
 This project is private and proprietary. All rights reserved.
 
-## Support
-
-For questions or issues:
-- Open an issue on GitHub
-- Contact via LinkedIn
-- Email: clement.peponnet@gmail.com
-
 ---
 
-**Built with ❤️ using Gradio, LiteLLM, and Hugging Face Spaces**
+**Built with ❤️ using Gradio, SmolAgent, and Hugging Face Spaces**
