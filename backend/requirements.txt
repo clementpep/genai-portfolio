@@ -1,5 +1,0 @@
-smolagents
-gradio
-huggingface_hub
-pyyaml
-pytz
