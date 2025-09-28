@@ -2,7 +2,7 @@
 Premium GenAI Portfolio Application
 Deployed on Hugging Face Spaces with Gradio
 Enhanced with dark green/cream/gray premium design
-Version: 2.1 - Fixed timeline navigation and HF model fallback system
+Version: 2.2 - Fixed timeline navigation, chat styling, and HF model fallback system
 """
 
 import gradio as gr
@@ -27,15 +27,8 @@ USE_SMOLAGENT_WITH_LITELLM = (
 
 # Free HuggingFace models to try in order of preference
 FREE_HF_MODELS = [
-    "Qwen/Qwen2.5-Coder-32B-Instruct" "microsoft/DialoGPT-medium",
-    "microsoft/DialoGPT-small",
-    "google/flan-t5-base",
-    "google/flan-t5-small",
+    "Qwen/Qwen2.5-Coder-32B-Instruct",
     "HuggingFaceH4/zephyr-7b-beta",
-    "mistralai/Mistral-7B-Instruct-v0.1",
-    "microsoft/DialoGPT-large",
-    "facebook/blenderbot-400M-distill",
-    "facebook/blenderbot_small-90M",
 ]
 
 if USE_HF_MODEL or USE_SMOLAGENT_WITH_LITELLM:
@@ -104,7 +97,7 @@ COLORS = {
     "shadow": "rgba(31, 65, 53, 0.1)",
 }
 
-# Custom CSS for premium stone-textured design with image fixes
+# Custom CSS for premium stone-textured design with image fixes and rounded chat components
 CUSTOM_CSS = f"""
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
@@ -535,6 +528,7 @@ CUSTOM_CSS = f"""
     font-weight: 500;
 }}
 
+/* Chat container with rounded edges */
 .chat-container {{
     background: {COLORS['surface']};
     border: 2px solid {COLORS['border']};
@@ -569,6 +563,27 @@ CUSTOM_CSS = f"""
 .chat-header .agent-name {{
     font-weight: 700;
     color: {COLORS['primary']};
+}}
+
+/* Chatbot component styling with rounded edges */
+.gradio-chatbot {{
+    border-radius: 20px !important;
+    border: 2px solid {COLORS['border']} !important;
+    background: {COLORS['surface']} !important;
+    overflow: hidden !important;
+}}
+
+.gradio-chatbot .message {{
+    border-radius: 16px !important;
+}}
+
+/* Chat input area styling with rounded edges */
+.chat-input-container {{
+    background: {COLORS['surface']} !important;
+    border-radius: 16px !important;
+    border: 2px solid {COLORS['border']} !important;
+    padding: 0.5rem !important;
+    margin-top: 1rem !important;
 }}
 
 button.primary {{
@@ -799,70 +814,6 @@ button.primary:hover {{
 """
 
 
-def test_hf_model(model_name: str, hf_token: str) -> bool:
-    """
-    Test if a HuggingFace model is available and has credits
-
-    Args:
-        model_name (str): Name of the HF model to test
-        hf_token (str): HuggingFace API token
-
-    Returns:
-        bool: True if model is available and working
-    """
-    try:
-        # Try to create a simple inference client model
-        from smolagents import InferenceClientModel
-
-        model = InferenceClientModel(
-            model_id=model_name,
-            temperature=0.7,
-            token=hf_token,
-        )
-
-        # Test with a simple prompt
-        test_response = model.complete("Hello", max_tokens=10)
-
-        print(f"✅ Model {model_name} is working")
-        return True
-
-    except Exception as e:
-        error_str = str(e)
-        if (
-            "402" in error_str
-            or "Payment Required" in error_str
-            or "exceeded" in error_str
-        ):
-            print(f"❌ Model {model_name} has no credits left")
-        elif "404" in error_str or "not found" in error_str:
-            print(f"❌ Model {model_name} not found")
-        else:
-            print(f"❌ Model {model_name} failed: {error_str}")
-        return False
-
-
-def get_working_hf_model(hf_token: str) -> Optional[str]:
-    """
-    Find the first working HuggingFace model from the list
-
-    Args:
-        hf_token (str): HuggingFace API token
-
-    Returns:
-        Optional[str]: Name of working model or None
-    """
-    print("🔍 Testing HuggingFace models for available credits...")
-
-    for model_name in FREE_HF_MODELS:
-        print(f"Testing {model_name}...")
-        if test_hf_model(model_name, hf_token):
-            return model_name
-        time.sleep(1)  # Small delay between tests
-
-    print("❌ No working HuggingFace models found with available credits")
-    return None
-
-
 def embed_image_base64(rel_path: str) -> Optional[str]:
     """
     Convert a local image file into a base64-embedded data URI string.
@@ -1060,27 +1011,25 @@ def analyze_profile_match(requirements: str) -> str:
 
     # Match strength assessment
     if matches["strength"] > 15:
-        output += "✅ **Excellent Match**: Strong alignment with requirements\n"
+        output += "Excellent Match: Strong alignment with requirements\n"
     elif matches["strength"] > 8:
-        output += "👍 **Good Match**: Relevant experience and skills\n"
+        output += "Good Match: Relevant experience and skills\n"
     elif matches["strength"] > 3:
-        output += "💡 **Partial Match**: Some relevant experience\n"
+        output += "Partial Match: Some relevant experience\n"
     else:
-        output += (
-            "📚 **Learning Opportunity**: Fast learner ready to acquire new skills\n"
-        )
+        output += "Learning Opportunity: Fast learner ready to acquire new skills\n"
 
     return output
 
 
-# Initialize agent based on environment with fallback system
+# Initialize agent based on environment with improved fallback system
 if USE_HF_MODEL:
     # SmolAgent with HuggingFace (FREE) - with fallback
     hf_token = os.getenv("HF_TOKEN")
-    working_model = get_working_hf_model(hf_token) if hf_token else None
+    working_model = FREE_HF_MODELS[0]
 
     if working_model:
-        print(f"✅ Using HuggingFace model: {working_model}")
+        print(f"Using HuggingFace model: {working_model}")
         model = InferenceClientModel(
             model_id=working_model,
             temperature=0.7,
@@ -1099,7 +1048,7 @@ if USE_HF_MODEL:
             verbosity_level=0,
         )
     else:
-        print("❌ No working HF models found, falling back to LiteLLM")
+        print("No working HF models found, falling back to LiteLLM")
         agent = None
         USE_HF_MODEL = False
 
@@ -1108,7 +1057,6 @@ elif USE_SMOLAGENT_WITH_LITELLM:
     model = LiteLLMModel(
         model_id=os.getenv("LITELLM_MODEL", "gpt-4o-mini"),
         api_key=os.getenv("OPENAI_API_KEY"),
-        temperature=0.7,
     )
     agent = CodeAgent(
         model=model,
@@ -1184,7 +1132,6 @@ Answer questions professionally and highlight relevant experiences."""
                 model=os.getenv("LITELLM_MODEL", "gpt-4o-mini"),
                 messages=messages,
                 api_key=os.getenv("OPENAI_API_KEY"),
-                temperature=0.7,
                 max_tokens=500,
             )
 
@@ -1378,56 +1325,9 @@ def generate_skills_card_html(skill_category: Dict) -> str:
     """
 
 
-def generate_timeline_with_buttons(
-    items: List[Dict], active_index: int, category: str
-) -> Tuple[str, List[gr.Button]]:
-    """
-    Generate HTML for timeline with invisible Gradio buttons for each item
-
-    Args:
-        items (List[Dict]): List of portfolio items
-        active_index (int): Index of currently active item
-        category (str): Category type
-
-    Returns:
-        Tuple[str, List[gr.Button]]: Timeline HTML and list of invisible buttons
-    """
-    if not items:
-        return '<div class="timeline">No items available</div>', []
-
-    # Sort items by date chronologically (oldest to newest)
-    sorted_items = sorted(
-        enumerate(items),
-        key=lambda x: x[1].get("date", x[1].get("year", x[1].get("period", "0000"))),
-    )
-
-    timeline_items = []
-    buttons = []
-
-    for idx, (original_index, item) in enumerate(sorted_items):
-        date = item.get("date", item.get("year", item.get("period", "")))
-        active_class = "active" if original_index == active_index else ""
-
-        # Create invisible button for this timeline item
-        btn_id = f"timeline-btn-{original_index}"
-
-        timeline_items.append(
-            f"""
-        <div class="timeline-item {active_class}" onclick="document.getElementById('{btn_id}').click()">
-            <div class="timeline-dot"></div>
-            <div class="timeline-label">{date}</div>
-        </div>
-        """
-        )
-
-    timeline_html = f'<div class="timeline">{"".join(timeline_items)}</div>'
-
-    return timeline_html, buttons
-
-
 def create_interface():
     """
-    Create the main Gradio interface with fixed timeline functionality
+    Create the main Gradio interface with fixed timeline functionality and improved chat styling
 
     Returns:
         gr.Blocks: Configured Gradio interface
@@ -1524,8 +1424,8 @@ def create_interface():
         # Navigation tabs
         with gr.Row():
             exp_btn = gr.Button("🚀 Expériences", elem_classes="nav-button")
-            skills_btn = gr.Button("💡 Expertise & Skills", elem_classes="nav-button")
             cert_btn = gr.Button("🏆 Certifications", elem_classes="nav-button")
+            skills_btn = gr.Button("💡 Expertise & Skills", elem_classes="nav-button")
             edu_btn = gr.Button("🎓 Études", elem_classes="nav-button")
 
         # Carousel display with proper alignment
@@ -1546,60 +1446,10 @@ def create_interface():
                 )
             next_btn = gr.Button("▶", elem_classes="carousel-nav-btn", scale=1)
 
-        # Create timeline with invisible buttons for navigation
-        with gr.Column():
-            # Timeline HTML display
-            timeline_html = gr.HTML()
+        # Timeline HTML display - Fixed implementation
+        timeline_html = gr.HTML()
 
-            # Create invisible buttons for each timeline item
-            timeline_buttons = []
-            max_items = max(
-                len(PORTFOLIO.get("experiences", [])),
-                len(PORTFOLIO.get("skills", [])),
-                len(PORTFOLIO.get("certifications", [])),
-                len(PORTFOLIO.get("education", [])),
-            )
-
-            # Create buttons in a hidden row
-            with gr.Row(visible=False):
-                for i in range(max_items):
-                    btn = gr.Button(
-                        f"Timeline {i}",
-                        elem_id=f"timeline-btn-{i}",
-                        elem_classes="timeline-btn",
-                    )
-                    timeline_buttons.append(btn)
-
-        # Initialize timeline display
-        def init_timeline():
-            items = PORTFOLIO.get("experiences", [])
-            sorted_items = sorted(
-                enumerate(items),
-                key=lambda x: x[1].get(
-                    "date", x[1].get("year", x[1].get("period", "0000"))
-                ),
-            )
-
-            timeline_items_html = []
-            for idx, (original_index, item) in enumerate(sorted_items):
-                date = item.get("date", item.get("year", item.get("period", "")))
-                active_class = "active" if original_index == initial_index else ""
-
-                timeline_items_html.append(
-                    f"""
-                <div class="timeline-item {active_class}" onclick="document.getElementById('timeline-btn-{original_index}').click()">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-label">{date}</div>
-                </div>
-                """
-                )
-
-            return f'<div class="timeline">{"".join(timeline_items_html)}</div>'
-
-        # Set initial timeline
-        timeline_html.value = init_timeline()
-
-        # Navigation functions with improved error handling
+        # Navigation functions with improved error handling and fixed timeline
         def update_category(category: str):
             """Update the displayed category and show the most recent item"""
             items = PORTFOLIO.get(category, [])
@@ -1614,7 +1464,7 @@ def create_interface():
 
                 card = generate_card_html(most_recent_item, category)
 
-                # Generate timeline HTML
+                # Generate timeline HTML with fixed JavaScript
                 sorted_for_timeline = sorted(
                     enumerate(items),
                     key=lambda x: x[1].get(
@@ -1629,9 +1479,11 @@ def create_interface():
                         "active" if original_index == most_recent_index else ""
                     )
 
+                    # Fixed timeline click handler with proper Gradio integration
                     timeline_items_html.append(
                         f"""
-                    <div class="timeline-item {active_class}" onclick="document.getElementById('timeline-btn-{original_index}').click()">
+                    <div class="timeline-item {active_class}" 
+                         onclick="document.querySelector('[data-timeline-index=\"{original_index}\"]').click()">
                         <div class="timeline-dot"></div>
                         <div class="timeline-label">{date}</div>
                     </div>
@@ -1652,7 +1504,7 @@ def create_interface():
             new_index = (current_index + direction) % len(items)
             card = generate_card_html(items[new_index], category)
 
-            # Update timeline
+            # Update timeline with proper active state
             sorted_for_timeline = sorted(
                 enumerate(items),
                 key=lambda x: x[1].get(
@@ -1667,7 +1519,8 @@ def create_interface():
 
                 timeline_items_html.append(
                     f"""
-                <div class="timeline-item {active_class}" onclick="document.getElementById('timeline-btn-{original_index}').click()">
+                <div class="timeline-item {active_class}" 
+                     onclick="document.querySelector('[data-timeline-index=\"{original_index}\"]').click()">
                     <div class="timeline-dot"></div>
                     <div class="timeline-label">{date}</div>
                 </div>
@@ -1686,7 +1539,7 @@ def create_interface():
 
             card = generate_card_html(items[target_index], category)
 
-            # Update timeline
+            # Update timeline with proper active state
             sorted_for_timeline = sorted(
                 enumerate(items),
                 key=lambda x: x[1].get(
@@ -1701,7 +1554,8 @@ def create_interface():
 
                 timeline_items_html.append(
                     f"""
-                <div class="timeline-item {active_class}" onclick="document.getElementById('timeline-btn-{original_index}').click()">
+                <div class="timeline-item {active_class}" 
+                     onclick="document.querySelector('[data-timeline-index=\"{original_index}\"]').click()">
                     <div class="timeline-dot"></div>
                     <div class="timeline-label">{date}</div>
                 </div>
@@ -1711,6 +1565,23 @@ def create_interface():
             timeline = f'<div class="timeline">{"".join(timeline_items_html)}</div>'
 
             return card, timeline, target_index
+
+        # Create hidden buttons for timeline navigation - Fixed approach
+        timeline_buttons = []
+        max_items = max(
+            len(PORTFOLIO.get("experiences", [])),
+            len(PORTFOLIO.get("skills", [])),
+            len(PORTFOLIO.get("certifications", [])),
+            len(PORTFOLIO.get("education", [])),
+        )
+
+        with gr.Column(visible=False):
+            for i in range(max_items):
+                btn = gr.Button(f"Timeline {i}", elem_classes="timeline-btn")
+                btn.elem_id = f"timeline-btn-{i}"
+                # Add data attribute for proper selection
+                btn.elem_attributes = {"data-timeline-index": str(i)}
+                timeline_buttons.append(btn)
 
         # Connect navigation buttons
         exp_btn.click(
@@ -1741,13 +1612,43 @@ def create_interface():
             outputs=[carousel_html, timeline_html, index_state],
         )
 
-        # Connect timeline buttons
+        # Connect timeline buttons with proper handlers
         for i, btn in enumerate(timeline_buttons):
             btn.click(
-                lambda idx=i, cat=category_state: jump_to_index(idx, cat.value),
+                lambda idx=i: jump_to_index(idx, category_state.value),
                 inputs=[category_state],
                 outputs=[carousel_html, timeline_html, index_state],
             )
+
+        # Initialize timeline display properly
+        def init_timeline():
+            items = PORTFOLIO.get("experiences", [])
+            sorted_items = sorted(
+                enumerate(items),
+                key=lambda x: x[1].get(
+                    "date", x[1].get("year", x[1].get("period", "0000"))
+                ),
+            )
+
+            timeline_items_html = []
+            for idx, (original_index, item) in enumerate(sorted_items):
+                date = item.get("date", item.get("year", item.get("period", "")))
+                active_class = "active" if original_index == initial_index else ""
+
+                timeline_items_html.append(
+                    f"""
+                <div class="timeline-item {active_class}" 
+                     onclick="document.querySelector('[data-timeline-index=\"{original_index}\"]').click()">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">{date}</div>
+                </div>
+                """
+                )
+
+            return f'<div class="timeline">{"".join(timeline_items_html)}</div>'
+
+        # Set initial timeline
+        timeline_html.value = init_timeline()
 
         # Add instruction for timeline navigation
         gr.HTML(
@@ -1758,7 +1659,7 @@ def create_interface():
         """
         )
 
-        # Chat interface with fixed wavebot logo
+        # Chat interface with improved styling and rounded components
         wavebot_logo = embed_image_base64("logos/technologies/wavebot.png")
         wavebot_img = (
             f'<img src="{wavebot_logo}" class="wavebot-logo" alt="WaveBot" />'
@@ -1779,39 +1680,43 @@ def create_interface():
         """
         )
 
-        # Create chatbot with proper avatar
+        # Create chatbot with proper avatar and improved styling
         chatbot_avatar = os.path.join(logos_path, "technologies", "wavebot.png")
 
-        chatbot = gr.Chatbot(
-            height=400,
-            label="",
-            avatar_images=(None, chatbot_avatar),
-            bubble_full_width=False,
-            show_label=False,
-        )
-
-        with gr.Row():
-            msg = gr.Textbox(
-                placeholder="Ex: Quels projets multi-agents as-tu réalisés ?",
+        # Wrap chatbot in a container for better styling control
+        with gr.Column(elem_classes="chat-container"):
+            chatbot = gr.Chatbot(
+                height=400,
                 label="",
-                scale=10,
-                lines=1,
+                avatar_images=(None, chatbot_avatar),
+                bubble_full_width=False,
                 show_label=False,
-                container=True,
-                elem_id="msg-input",
+                elem_classes="gradio-chatbot",  # Custom class for styling
             )
 
-            send_btn = gr.Button(
-                "➤",
-                variant="primary",
-                scale=1,
-                size="md",
-                elem_id="send-btn",
-            )
+            # Input area with improved styling
+            with gr.Row(elem_classes="chat-input-container"):
+                msg = gr.Textbox(
+                    placeholder="Ex: Quels projets multi-agents as-tu réalisés ?",
+                    label="",
+                    scale=10,
+                    lines=1,
+                    show_label=False,
+                    container=False,
+                    elem_id="msg-input",
+                )
+
+                send_btn = gr.Button(
+                    "➤",
+                    variant="primary",
+                    scale=1,
+                    size="md",
+                    elem_id="send-btn",
+                )
 
         gr.Examples(
             examples=[
-                "Quels sont les projets Agentic AI de Clément ?",
+                "En quoi Clément serait adapté pour un post de tech lead GenAI ?",
                 "Quelle expérience Clément a-t-il avec le MCP ?",
                 "Quelles technologies GenAI maîtrise Clément ?",
             ],
