@@ -52,7 +52,7 @@ A premium portfolio showcasing GenAI and Agentic AI expertise with an elegant da
 ## 📁 Project Structure
 
 ```
-portfolio-genai/
+genai-portfolio/
 ├── app.py                  # Main application with both LLM options
 ├── portfolio_data.yaml     # All portfolio content (easy to update)
 ├── requirements.txt        # Python dependencies
@@ -69,7 +69,7 @@ portfolio-genai/
 ```bash
 # Clone repository
 git clone <your-repo>
-cd portfolio-genai
+cd genai-portfolio
 
 # Install dependencies
 pip install -r requirements.txt
@@ -342,7 +342,7 @@ To use PNG logos instead of emojis:
    ```
    Type: CNAME
    Name: portfolio
-   Value: username-portfolio-genai.hf.space
+   Value: username-genai-portfolio.hf.space
    ```
 3. Wait for DNS propagation (up to 48h)
 
@@ -371,7 +371,7 @@ To contribute improvements:
 ## 📞 Support
 
 - **LinkedIn**: [Clément Peponnet](https://www.linkedin.com/in/clément-peponnet-b26906194)
-- **GitHub**: [@clemenpep](https://github.com/clementpep)
+- **GitHub**: [@clementpep](https://github.com/clementpep)
 - **Issues**: Open an issue on GitHub
 
 ## 📄 License

@@ -123,5 +123,5 @@ To contribute to this project:
 
 ---
 
-**Project Repository**: https://github.com/clemenpep/portfolio-genai  
-**Live Demo**: https://huggingface.co/spaces/[username]/portfolio-genai
+**Project Repository**: https://github.com/clementpep/genai-portfolio  
+**Live Demo**: https://huggingface.co/spaces/[username]/genai-portfolio

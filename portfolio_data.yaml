@@ -21,10 +21,34 @@ experiences:
       - Flask
       - Docker
       - Azure App Service
-    impact: "Industrialisation réussie chez grand compte luxe"
+    impact: "Déploiement de l'outil chez grand compte dans le secteur du luxe"
     sector: "Digital Transformation"
 
   - id: exp2
+    title: "PoC GenAI Analyse Enquêtes Satisfaction – Hackathon Microsoft x ENGIE"
+    client: "ENGIE (Hackathon Microsoft)"
+    duration: "1 semaine"
+    date: "2024-03"
+    period: "2024-03"
+    icon: "💬"
+    description: >
+      Tech lead et développement d’un outil GenAI d’analyse d’enquêtes de satisfaction dans le cadre du 
+      hackathon Microsoft x ENGIE. Coaching d’une équipe de 6 développeurs pour concevoir un chatbot RAG. 
+      Définition des besoins métier et traduction en fonctionnalités techniques. Création d’une base de 
+      données vectorielle avec Azure AI Search. Orchestration du RAG en no/low-code (Azure AI Search + 
+      GPT-4 Turbo 128k) via Power Automate. Personnalisation et déploiement en production du chatbot sur Teams 
+      avec Copilot Studio. Résultat : 3ᵉ place sur 80 participants.
+    technologies:
+      - Azure AI Search
+      - GPT-4 Turbo 128k
+      - Power Automate
+      - Copilot Studio
+      - RAG
+      - Teams
+    impact: "3ᵉ place au hackathon sur 80 participants, PoC déployé en production"
+    sector: "Analytics"
+
+  - id: exp3
     title: "Système Multi-Agents SentinelOne"
     client: "Hugging Face x Gradio"
     duration: "Hackathon"
@@ -44,11 +68,11 @@ experiences:
       - FastMCP
       - NASA FIRMS
       - Open-Meteo
-    impact: "2e prix international"
+    impact: "2e prix international dans la catégorie AI Agents"
     sector: "Climate Tech"
 
-  - id: exp3
-    title: "Développement et déploiement MCP Servers"
+  - id: exp4
+    title: "Développement et déploiement servers MCP"
     client: "Confidential Transport Company"
     duration: "4 mois"
     date: "2025-04"
@@ -58,35 +82,17 @@ experiences:
       Tech lead et développeur sur 3 serveurs MCP (Model Context Protocol) connectés à LibreChat: 
       Bing Search (recherche web sécurisée via Azure), Microsoft Graph (lecture/écriture M365 
       avec génération automatisée de comptes rendus), et Python Interpreter (exécution autonome 
-      de code). Déploiement sur Azure Kubernetes (AKS) avec gestion des certificats.
+      de code). Déploiement sur Azure Kubernetes (AKS) avec gestion fine des autorisations via OAuth2 (Azure Entra ID).
     technologies:
-      - MCP
+      - MCP (FastMCP)
       - LibreChat
+      - LiteLLM
       - Docker
-      - Azure AKS
       - Microsoft Graph
+      - Azure Entra ID
+      - Azure AKS
       - Python
     impact: "MVP déployé pour +100 utilisateurs, amélioration de la productivité des utilisateurs"
-    sector: "Transport"
-
-  - id: exp4
-    title: "Dataiku Multi-Agent Workflow"
-    client: "ALSTOM"
-    duration: "4 mois"
-    date: "2025-08"
-    period: "2025-12"
-    icon: "🤖"
-    description: >
-      Conception et pilotage d'un pipeline multi-agents (12 agents) sur Dataiku LLM Mesh pour 
-      automatiser la validation de plus de 80,000 Purchase Requisitions annuelles, avec 
-      encadrement direct de 3 consultants. Allègement significatif de la charge administrative 
-      (équivalent 50 ETP) grâce à une combinaison de règles métiers et de briques GenAI.
-    technologies:
-      - Dataiku LLM Mesh
-      - Multi-Agent Systems
-      - GenAI
-      - Python
-    impact: "Amélioration du temps de traitement de 98,3%, projet vitrine COMEX"
     sector: "Transport"
 
   - id: exp5
@@ -113,27 +119,25 @@ experiences:
     sector: "Produit Interne"
 
   - id: exp6
-    title: "PoC GenAI Analyse Enquêtes Satisfaction"
-    client: "Wavestone"
-    duration: "6 mois"
-    date: "2024-03"
-    period: "2024-06"
-    icon: "💬"
+    title: "Dataiku Multi-Agent Workflow"
+    client: "ALSTOM"
+    duration: "4 mois"
+    date: "2025-08"
+    period: "2025-12"
+    icon: "🤖"
     description: >
-      Définition des besoins métier du Chatbot et traduction en fonctionnalités techniques. 
-      Création de la base de données vectorielle (indexation BERT avec LlamaIndex), comparaison 
-      de retrievers SPARSE/DENSE pour déterminer le plus adapté au cas d'usage. Développement 
-      d'une application web Streamlit avec GPT4-32k via Azure OpenAI et mesure des performances 
-      du retriever.
+      Conception et pilotage d'un pipeline multi-agents (12 agents) sur Dataiku LLM Mesh pour 
+      automatiser la validation de plus de 80,000 Purchase Requisitions annuelles, avec 
+      encadrement direct de 3 consultants. Allègement significatif de la charge administrative 
+      (équivalent 50 ETP) grâce à une combinaison de règles métiers et de briques GenAI.
     technologies:
-      - LlamaIndex
-      - GPT-4
-      - Streamlit
-      - Azure OpenAI
-      - BERT
-      - RAG
-    impact: "PoC transformé en solution production"
-    sector: "Analytics"
+      - Dataiku LLM Mesh
+      - Multi-Agent Systems
+      - GenAI
+      - Python
+    impact: "Amélioration du temps de traitement de 98,3%, projet vitrine COMEX"
+    sector: "Transport"
+
 
 skills:
   - category: "Agents & MCP"
