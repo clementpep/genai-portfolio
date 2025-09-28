@@ -5,6 +5,7 @@ experiences:
   - id: exp1
     title: "WaveTranslate - MVP GenAI Traduction"
     client: "Wavestone"
+    client_logo: wavestone.png
     duration: "12 mois"
     date: "2023-12"
     period: "2024-12"
@@ -27,6 +28,7 @@ experiences:
   - id: exp2
     title: "PoC GenAI Analyse Enquêtes Satisfaction – Hackathon Microsoft x ENGIE"
     client: "ENGIE (Hackathon Microsoft)"
+    client_logo: engie.png
     duration: "1 semaine"
     date: "2024-03"
     period: "2024-03"
@@ -51,6 +53,7 @@ experiences:
   - id: exp3
     title: "Système Multi-Agents SentinelOne"
     client: "Hugging Face x Gradio"
+    client_logo: huggingface.png
     duration: "Hackathon"
     date: "2025-03"
     period: "2025-04"
@@ -98,6 +101,7 @@ experiences:
   - id: exp5
     title: "WavePPT - Serveur MCP génération PowerPoint"
     client: "Wavestone"
+    client_logo: wavestone.png
     duration: "4 mois"
     date: "2025-06"
     period: "2025-10"
@@ -121,6 +125,7 @@ experiences:
   - id: exp6
     title: "Dataiku Multi-Agent Workflow"
     client: "ALSTOM"
+    client_logo: alstom.png
     duration: "4 mois"
     date: "2025-08"
     period: "2025-12"

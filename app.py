@@ -7,6 +7,7 @@ Enhanced with dark green/cream/gray premium design
 import gradio as gr
 import yaml
 import os
+import base64
 from typing import List, Dict, Optional, Tuple
 from dotenv import load_dotenv
 
@@ -600,6 +601,23 @@ input:focus, textarea:focus {{
 .card:hover::after {{
     opacity: 1;
 }}
+
+.card-logo img {{
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* ensure logos keep aspect ratio */
+    border-radius: 14px; /* rounded corners for logos */
+    background: transparent;
+    padding: 6px;
+}}
+.tech-badge img {{
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    vertical-align: middle;
+    margin-right: 8px;
+    border-radius: 4px;
+}}
 """
 
 
@@ -860,37 +878,95 @@ Answer questions professionally and highlight relevant experiences."""
         return "", history
 
 
-# Generate HTML for carousel card
-def generate_card_html(item: Dict, category: str) -> str:
-    """Generate HTML for a portfolio item card"""
+def embed_image_base64(rel_path: str) -> Optional[str]:
+    """
+    Convert a local image file into a base64-embedded data URI string.
+    Input: relative path to the image (repo root).
+    Output: 'data:image/...;base64,...' or None if not found.
+    """
+    abs_path = os.path.join(os.path.dirname(__file__), rel_path)
+    if not os.path.exists(abs_path):
+        return None
+    try:
+        with open(abs_path, "rb") as f:
+            encoded = base64.b64encode(f.read()).decode("utf-8")
+        ext = os.path.splitext(rel_path)[1].lower()
+        mime = "image/png"
+        if ext == ".jpg" or ext == ".jpeg":
+            mime = "image/jpeg"
+        elif ext == ".svg":
+            mime = "image/svg+xml"
+        elif ext == ".webp":
+            mime = "image/webp"
+        return f"data:{mime};base64,{encoded}"
+    except Exception:
+        return None
 
-    icon = item.get("icon", "📌")
+
+def generate_card_html(item: Dict, category: str) -> str:
+    """Generate HTML for a portfolio item card. Handles client + tech logos if present."""
+    icon = item.get("icon", "")  # could be emoji OR filename
     title = item.get("title", "")
     subtitle = item.get("client", item.get("issuer", item.get("school", "")))
     description = item.get("description", item.get("focus", ""))
     duration = item.get("duration", item.get("year", ""))
     techs = item.get("technologies", item.get("skills", []))
     impact = item.get("impact", "")
-
     tech_badges = "".join(
         [f'<span class="tech-badge">{tech}</span>' for tech in techs[:6]]
     )
 
-    return f"""
-    <div class="card">
-        <div class="card-header">
-            <div class="card-logo">{icon}</div>
-            <div style="flex: 1;">
-                <div class="card-title">{title}</div>
-                {f'<div class="card-subtitle">{subtitle}</div>' if subtitle else ''}
+    # --- Determine client logo URL ---
+    client_logo_field = item.get("client_logo")  # recommended explicit field in YAML
+    client_logo_url = None
+    if client_logo_field:
+        client_logo_url = embed_image_base64(client_logo_field)
+
+    if client_logo_url:
+        logo_html = f'<img src="{client_logo_url}" alt="{subtitle}" />'
+    else:
+        # fallback emoji or icon
+        logo_html = f'<div style="font-size: 2.2rem;">{icon or "📌"}</div>'
+
+    tech_badges_html = []
+    for tech in techs[:6]:
+        tech_name = tech if isinstance(tech, str) else str(tech)
+        tech_base = tech_name.lower().replace(" ", "_")
+        logo_data = None
+        # try embed from different candidate paths
+        for candidate in [
+            f"logos/technologies/{tech_base}.png",
+            f"logos/technologies/{tech_base}.svg",
+            f"logos/{tech_base}.png",
+            f"logos/{tech_base}.svg",
+        ]:
+            logo_data = embed_image_base64(candidate)
+            if logo_data:
+                break
+
+        if logo_data:
+            tech_badges_html.append(
+                f'<span class="tech-badge"><img src="{logo_data}" alt="{tech_name}" />{tech_name}</span>'
+            )
+        else:
+            tech_badges_html.append(f'<span class="tech-badge">{tech_name}</span>')
+
+        # --- Return final card ---
+        return f"""
+        <div class="card">
+            <div class="card-header">
+                <div class="card-logo">{logo_html}</div>
+                <div style="flex: 1;">
+                    <div class="card-title">{title}</div>
+                    {f'<div class="card-subtitle">{subtitle}</div>' if subtitle else ''}
+                </div>
             </div>
+            <div class="card-content">{description}</div>
+            {f'<div class="card-meta">📅 {duration}</div>' if duration else ''}
+            {f'<div class="card-meta">🎯 {impact}</div>' if impact else ''}
+            <div style="margin-top: auto;">{tech_badges}</div>
         </div>
-        <div class="card-content">{description}</div>
-        {f'<div class="card-meta">📅 {duration}</div>' if duration else ''}
-        {f'<div class="card-meta">🎯 {impact}</div>' if impact else ''}
-        <div style="margin-top: auto;">{tech_badges}</div>
-    </div>
-    """
+        """
 
 
 # Generate timeline HTML with click handlers
@@ -985,14 +1061,14 @@ def create_interface():
                 <div class="stat-label">Certifications AI</div>
             </div>
             <div class="stat-card">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🥇</div>
+                <div class="stat-value">2</div>
+                <div class="stat-label">Hackathons (gagnés/particip.)</div>
+            </div>
+            <div class="stat-card">
                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">💼</div>
                 <div class="stat-value">50+</div>
                 <div class="stat-label">Pitchs GenAI</div>
-            </div>
-            <div class="stat-card">
-                <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
-                <div class="stat-value">6000+</div>
-                <div class="stat-label">Utilisateurs produits</div>
             </div>
         </div>
         """
