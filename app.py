@@ -253,15 +253,16 @@ CUSTOM_CSS = f"""
     padding: 2.5rem 0;
     position: relative;
     margin-top: 2rem;
+    overflow-x: auto; /* Allow horizontal scrolling on mobile */
+    padding-bottom: 1.5rem; /* Add padding for scrollbar */
 }}
 
 .timeline::before {{
     content: '';
     position: absolute;
     top: calc(2.5rem + 10px);
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 20%);
+    left: 0;
+    width: 100%;
     height: 3px;
     background: linear-gradient(90deg, 
         transparent, 
@@ -280,6 +281,8 @@ CUSTOM_CSS = f"""
     transition: all 0.3s ease;
     position: relative;
     z-index: 1;
+    flex: 0 0 auto; /* Prevent shrinking */
+    min-width: 50px; /* Minimum width */
 }}
 
 .timeline-dot {{
@@ -364,6 +367,7 @@ CUSTOM_CSS = f"""
     padding: 0 !important;
     background: {COLORS['surface']} !important;
     border: 2px solid {COLORS['border']} !important;
+    flex-shrink: 0 !important; /* Prevent button from shrinking */
 }}
 
 /* Hover state for nav buttons */
@@ -610,6 +614,7 @@ input:focus, textarea:focus {{
     background: transparent;
     padding: 6px;
 }}
+
 .tech-badge img {{
     width: 18px;
     height: 18px;
@@ -618,7 +623,157 @@ input:focus, textarea:focus {{
     margin-right: 8px;
     border-radius: 4px;
 }}
+
+/* Skill card specific styling */
+.skills-card-content {{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    width: 100%;
+}}
+
+.skill-item {{
+    background: rgba(31, 65, 53, 0.05);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: {COLORS['text_primary']};
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}}
+
+.skill-item:hover {{
+    background: rgba(31, 65, 53, 0.1);
+    transform: translateY(-2px);
+}}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {{
+    .premium-header {{
+        padding: 2rem 1.5rem;
+    }}
+    
+    .premium-header h1 {{
+        font-size: 2.2rem;
+    }}
+    
+    .social-links {{
+        flex-direction: column;
+        gap: 0.75rem;
+    }}
+    
+    .carousel-wrapper {{
+        flex-direction: column;
+        gap: 1rem;
+    }}
+    
+    .carousel-nav-btn {{
+        margin: 0 auto;
+    }}
+    
+    .card {{
+        padding: 1.5rem;
+        min-height: auto;
+    }}
+    
+    .card-header {{
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1rem;
+    }}
+    
+    .stats-container {{
+        grid-template-columns: 1fr;
+    }}
+    
+    .timeline {{
+        gap: 1.5rem;
+        justify-content: flex-start;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }}
+    
+    .timeline-item {{
+        min-width: 40px;
+    }}
+    
+    .timeline-label {{
+        font-size: 0.7rem;
+    }}
+    
+    .nav-button {{
+        padding: 0.75rem 1rem !important;
+        font-size: 0.9rem !important;
+    }}
+    
+    .chat-header {{
+        font-size: 1.5rem;
+    }}
+}}
+
+/* Fix specifically for skills cards */
+.category-title {{
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: {COLORS['primary']};
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}}
+
+.category-icon {{
+    font-size: 1.75rem;
+}}
+
+.skills-list {{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}}
+
+.skills-list li {{
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: {COLORS['text_secondary']};
+    line-height: 1.6;
+}}
+
+.skills-list li::before {{
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: {COLORS['primary']};
+    font-weight: bold;
+}}
 """
+
+
+def embed_image_base64(rel_path: str) -> Optional[str]:
+    """
+    Convert a local image file into a base64-embedded data URI string.
+    Input: relative path to the image (repo root).
+    Output: 'data:image/...;base64,...' or None if not found.
+    """
+    abs_path = os.path.join(os.path.dirname(__file__), rel_path)
+    if not os.path.exists(abs_path):
+        return None
+    try:
+        with open(abs_path, "rb") as f:
+            encoded = base64.b64encode(f.read()).decode("utf-8")
+        ext = os.path.splitext(rel_path)[1].lower()
+        mime = "image/png"
+        if ext == ".jpg" or ext == ".jpeg":
+            mime = "image/jpeg"
+        elif ext == ".svg":
+            mime = "image/svg+xml"
+        elif ext == ".webp":
+            mime = "image/webp"
+        return f"data:{mime};base64,{encoded}"
+    except Exception:
+        return None
 
 
 # SmolAgent tools
@@ -878,33 +1033,12 @@ Answer questions professionally and highlight relevant experiences."""
         return "", history
 
 
-def embed_image_base64(rel_path: str) -> Optional[str]:
-    """
-    Convert a local image file into a base64-embedded data URI string.
-    Input: relative path to the image (repo root).
-    Output: 'data:image/...;base64,...' or None if not found.
-    """
-    abs_path = os.path.join(os.path.dirname(__file__), rel_path)
-    if not os.path.exists(abs_path):
-        return None
-    try:
-        with open(abs_path, "rb") as f:
-            encoded = base64.b64encode(f.read()).decode("utf-8")
-        ext = os.path.splitext(rel_path)[1].lower()
-        mime = "image/png"
-        if ext == ".jpg" or ext == ".jpeg":
-            mime = "image/jpeg"
-        elif ext == ".svg":
-            mime = "image/svg+xml"
-        elif ext == ".webp":
-            mime = "image/webp"
-        return f"data:{mime};base64,{encoded}"
-    except Exception:
-        return None
-
-
 def generate_card_html(item: Dict, category: str) -> str:
     """Generate HTML for a portfolio item card. Handles client + tech logos if present."""
+    # Special handling for skills category
+    if category == "skills":
+        return generate_skills_card_html(item)
+
     icon = item.get("icon", "")  # could be emoji OR filename
     title = item.get("title", "")
     subtitle = item.get("client", item.get("issuer", item.get("school", "")))
@@ -912,35 +1046,69 @@ def generate_card_html(item: Dict, category: str) -> str:
     duration = item.get("duration", item.get("year", ""))
     techs = item.get("technologies", item.get("skills", []))
     impact = item.get("impact", "")
-    tech_badges = "".join(
-        [f'<span class="tech-badge">{tech}</span>' for tech in techs[:6]]
-    )
 
-    # --- Determine client logo URL ---
-    client_logo_field = item.get("client_logo")  # recommended explicit field in YAML
+    # Find client logo
     client_logo_url = None
-    if client_logo_field:
-        client_logo_url = embed_image_base64(client_logo_field)
 
+    # Check for client_logo field first
+    if "client_logo" in item:
+        client_logo_paths = [
+            f"logos/{item['client_logo']}",
+            f"logos/clients/{item['client_logo']}",
+        ]
+
+        for path in client_logo_paths:
+            logo_data = embed_image_base64(path)
+            if logo_data:
+                client_logo_url = logo_data
+                break
+
+    # If no client_logo or logo not found, try to find based on client name
+    if not client_logo_url and subtitle:
+        client_base = subtitle.lower().replace(" ", "_").replace("-", "_")
+        client_logo_paths = [
+            f"logos/clients/{client_base}.png",
+            f"logos/clients/{client_base}.svg",
+            f"logos/{client_base}.png",
+            f"logos/{client_base}.svg",
+        ]
+
+        for path in client_logo_paths:
+            logo_data = embed_image_base64(path)
+            if logo_data:
+                client_logo_url = logo_data
+                break
+
+    # Logo HTML - either image or emoji
     if client_logo_url:
         logo_html = f'<img src="{client_logo_url}" alt="{subtitle}" />'
     else:
         # fallback emoji or icon
         logo_html = f'<div style="font-size: 2.2rem;">{icon or "📌"}</div>'
 
+    # Generate tech badges with logos when available
     tech_badges_html = []
     for tech in techs[:6]:
         tech_name = tech if isinstance(tech, str) else str(tech)
-        tech_base = tech_name.lower().replace(" ", "_")
+        tech_base = (
+            tech_name.lower()
+            .replace(" ", "_")
+            .replace("-", "_")
+            .replace("/", "_")
+            .replace(".", "_")
+        )
+
+        # Try multiple possible paths for tech logos
         logo_data = None
-        # try embed from different candidate paths
-        for candidate in [
+        logo_paths = [
             f"logos/technologies/{tech_base}.png",
             f"logos/technologies/{tech_base}.svg",
             f"logos/{tech_base}.png",
             f"logos/{tech_base}.svg",
-        ]:
-            logo_data = embed_image_base64(candidate)
+        ]
+
+        for path in logo_paths:
+            logo_data = embed_image_base64(path)
             if logo_data:
                 break
 
@@ -951,27 +1119,57 @@ def generate_card_html(item: Dict, category: str) -> str:
         else:
             tech_badges_html.append(f'<span class="tech-badge">{tech_name}</span>')
 
-        # --- Return final card ---
-        return f"""
-        <div class="card">
-            <div class="card-header">
-                <div class="card-logo">{logo_html}</div>
-                <div style="flex: 1;">
-                    <div class="card-title">{title}</div>
-                    {f'<div class="card-subtitle">{subtitle}</div>' if subtitle else ''}
-                </div>
+    # Join all tech badges
+    tech_badges = "".join(tech_badges_html)
+
+    # Return final card HTML
+    return f"""
+    <div class="card">
+        <div class="card-header">
+            <div class="card-logo">{logo_html}</div>
+            <div style="flex: 1;">
+                <div class="card-title">{title}</div>
+                {f'<div class="card-subtitle">{subtitle}</div>' if subtitle else ''}
             </div>
-            <div class="card-content">{description}</div>
-            {f'<div class="card-meta">📅 {duration}</div>' if duration else ''}
-            {f'<div class="card-meta">🎯 {impact}</div>' if impact else ''}
-            <div style="margin-top: auto;">{tech_badges}</div>
         </div>
-        """
+        <div class="card-content">{description}</div>
+        {f'<div class="card-meta">📅 {duration}</div>' if duration else ''}
+        {f'<div class="card-meta">🎯 {impact}</div>' if impact else ''}
+        <div style="margin-top: auto;">{tech_badges}</div>
+    </div>
+    """
+
+
+def generate_skills_card_html(skill_category: Dict) -> str:
+    """Generate HTML specifically for skills cards"""
+    category = skill_category.get("category", "")
+    icon = skill_category.get("icon", "💡")
+    skills = skill_category.get("skills", [])
+
+    skills_html = ""
+    for skill in skills:
+        skills_html += f"<li>{skill}</li>"
+
+    return f"""
+    <div class="card">
+        <div class="category-title">
+            <span class="category-icon">{icon}</span>
+            {category}
+        </div>
+        <div class="card-content">
+            <ul class="skills-list">
+                {skills_html}
+            </ul>
+        </div>
+    </div>
+    """
 
 
 # Generate timeline HTML with click handlers
 def generate_timeline_html(items: List[Dict], active_index: int, category: str) -> str:
     """Generate HTML for interactive timeline with chronological order"""
+    if not items:
+        return '<div class="timeline">No items available</div>'
 
     # Sort items by date chronologically (oldest to newest)
     sorted_items = sorted(
@@ -980,13 +1178,13 @@ def generate_timeline_html(items: List[Dict], active_index: int, category: str) 
     )
 
     timeline_items = []
-    for original_index, item in sorted_items:
+    for idx, (original_index, item) in enumerate(sorted_items):
         date = item.get("date", item.get("year", item.get("period", "")))
         active_class = "active" if original_index == active_index else ""
 
         timeline_items.append(
             f"""
-        <div class="timeline-item {active_class}" onclick="window.jumpToCard({original_index})">
+        <div class="timeline-item {active_class}" data-index="{original_index}" onclick="window.jumpToCard({original_index})">
             <div class="timeline-dot"></div>
             <div class="timeline-label">{date}</div>
         </div>
@@ -1235,17 +1433,18 @@ def create_interface():
         """
         )
 
+        # Create a nice and unique chatbot avatar URL using the wavebot.png logo
+        chatbot_avatar = os.path.join(logos_path, "technologies", "wavebot.png")
+
         chatbot = gr.Chatbot(
             height=400,
             label="",
-            avatar_images=(os.path.join(logos_path, "wavebot.png"), None),
+            avatar_images=(chatbot_avatar, None),
             bubble_full_width=False,
             show_label=False,
         )
 
         with gr.Row():
-            # Chat input: give the textbox an elem_id so CSS can control its height,
-            # and make the send button rectangular (elem_id=send-btn already targeted).
             msg = gr.Textbox(
                 placeholder="Ex: Quels projets multi-agents as-tu réalisés ?",
                 label="",

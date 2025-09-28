@@ -17,11 +17,11 @@ experiences:
       un grand compte du secteur du luxe.
     technologies:
       - Azure AI Foundry
-      - Mistral Large
-      - ReactJS
+      - Mistral
+      - React
       - Flask
       - Docker
-      - Azure App Service
+      - Azure
     impact: "Déploiement de l'outil chez grand compte dans le secteur du luxe"
     sector: "Digital Transformation"
 
@@ -42,12 +42,11 @@ experiences:
       avec Copilot Studio. Résultat : 3ᵉ place sur 80 participants.
     technologies:
       - Azure AI Search
-      - GPT-4 Turbo 128k
+      - Azure AI Foundry
       - Power Automate
       - Copilot Studio
-      - RAG
       - Teams
-    impact: "3ᵉ place au hackathon sur 80 participants, PoC déployé en production"
+    impact: "3ᵉ place au hackathon sur 80 participants, PoC déployé en production sur Teams"
     sector: "Analytics"
 
   - id: exp3
@@ -68,15 +67,14 @@ experiences:
       - SmolAgent
       - LiteLLM
       - Gradio
-      - FastMCP
-      - NASA FIRMS
-      - Open-Meteo
+      - Hugging Face
     impact: "2e prix international dans la catégorie AI Agents"
     sector: "Climate Tech"
 
   - id: exp4
     title: "Développement et déploiement servers MCP"
     client: "Confidential Transport Company"
+    client_logo: mcp.png
     duration: "4 mois"
     date: "2025-04"
     period: "2025-08"
@@ -87,14 +85,13 @@ experiences:
       avec génération automatisée de comptes rendus), et Python Interpreter (exécution autonome 
       de code). Déploiement sur Azure Kubernetes (AKS) avec gestion fine des autorisations via OAuth2 (Azure Entra ID).
     technologies:
-      - MCP (FastMCP)
+      - MCP
       - LibreChat
       - LiteLLM
       - Docker
       - Microsoft Graph
-      - Azure Entra ID
-      - Azure AKS
-      - Python
+      - Azure
+      - Azure Kubernetes
     impact: "MVP déployé pour +100 utilisateurs, amélioration de la productivité des utilisateurs"
     sector: "Transport"
 
@@ -115,8 +112,7 @@ experiences:
     technologies:
       - MCP
       - Docker
-      - Azure ACR
-      - Azure App Service
+      - Azure
       - Copilot Studio
       - MCP Shield
     impact: "Déploiement pour 6000+ utilisateurs, gain en productivité"
@@ -136,10 +132,10 @@ experiences:
       encadrement direct de 3 consultants. Allègement significatif de la charge administrative 
       (équivalent 50 ETP) grâce à une combinaison de règles métiers et de briques GenAI.
     technologies:
-      - Dataiku LLM Mesh
-      - Multi-Agent Systems
-      - GenAI
-      - Python
+      - Dataiku
+      - SAP Ariba
+      - Azure
+      - Microsoft Graph
     impact: "Amélioration du temps de traitement de 98,3%, projet vitrine COMEX"
     sector: "Transport"
 
@@ -173,7 +169,7 @@ skills:
       - "Backend: FastAPI, Django, Flask, Streamlit"
       - "Frontend: React"
       - Docker
-      - Azure (AKS, ACR, App Service)
+      - Azure (AKS, ACR, App Service, MS Graph, Entra ID)
       - CI/CD (GitLab, GitHub Actions)
 
   - category: "Data & Machine Learning"
@@ -187,18 +183,18 @@ skills:
 
 certifications:
   - id: cert1
-    name: "Azure AI Engineer Associate"
+    name: "Azure AI Engineer Associate - AI-102"
     issuer: "Microsoft"
-    year: "2024"
-    date: "2024"
+    year: "2025"
+    date: "2025"
     icon: "☁️"
     description: "Certification officielle Microsoft pour la conception et l'implémentation de solutions IA utilisant les services Azure AI."
 
   - id: cert2
     name: "Dataiku GenAI Practitioner"
     issuer: "Dataiku"
-    year: "2024"
-    date: "2024"
+    year: "2025"
+    date: "2025"
     icon: "📊"
     description: "Spécialisation GenAI sur plateforme Dataiku, incluant LLM Mesh et systèmes multi-agents."
 
@@ -218,7 +214,7 @@ education:
     date: "2019"
     icon: "🎓"
     achievement: "Classé 38/120, Médaille d'argent"
-    description: "Diplômé avec médaille d'argent, classé 38e sur 120 étudiants. Formation d'ingénieur généraliste avec spécialisation en informatique."
+    description: "🥈 Diplômé avec médaille d'argent, classé 38e sur 120 étudiants. Formation d'ingénieur généraliste avec spécialisation en informatique."
 
   - id: edu2
     school: "ETS Montréal"
