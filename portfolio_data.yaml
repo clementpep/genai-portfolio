@@ -1,15 +1,12 @@
-# Portfolio Data Configuration
-# Update this file to add new experiences, skills, certifications, or education
-
 experiences:
   - id: exp1
     title: "WaveTranslate - MVP GenAI Traduction"
     client: "Wavestone"
-    client_logo: wavestone.png
+    client_logo: logos/clients/wavestone.png
     duration: "12 mois"
     date: "2023-12"
     period: "2024-12"
-    icon: "🌐"
+    icon: "🌍"
     description: >
       Tech lead d'une équipe de 5 développeurs sur un traducteur GenAI basé sur Mistral Large 
       via Azure AI Foundry. Développement d'une web app fullstack (ReactJS + Flask) avec 
@@ -28,31 +25,31 @@ experiences:
   - id: exp2
     title: "PoC GenAI Analyse Enquêtes Satisfaction – Hackathon Microsoft x ENGIE"
     client: "ENGIE (Hackathon Microsoft)"
-    client_logo: engie.png
+    client_logo: logos/clients/engie.png
     duration: "3 jours"
     date: "2024-03"
     period: "2024-03"
     icon: "💬"
     description: >
-      Tech lead et développement d’un outil GenAI d’analyse d’enquêtes de satisfaction dans le cadre du 
-      hackathon Microsoft x ENGIE. Coaching d’une équipe de 6 développeurs pour concevoir un chatbot RAG. 
-      Définition des besoins métier et traduction en fonctionnalités techniques. Création d’une base de 
+      Tech lead et développement d'un outil GenAI d'analyse d'enquêtes de satisfaction dans le cadre du 
+      hackathon Microsoft x ENGIE. Coaching d'une équipe de 6 développeurs pour concevoir un chatbot RAG. 
+      Définition des besoins métier et traduction en fonctionnalités techniques. Création d'une base de 
       données vectorielle avec Azure AI Search. Orchestration du RAG en no/low-code (Azure AI Search + 
       GPT-4 Turbo 128k) via Power Automate. Personnalisation et déploiement en production du chatbot sur Teams 
-      avec Copilot Studio. Résultat : 3ᵉ place sur 80 participants.
+      avec Copilot Studio. Résultat : 3ème place sur 80 participants.
     technologies:
       - Azure AI Search
       - Azure AI Foundry
       - Power Automate
       - Copilot Studio
       - Teams
-    impact: "3ᵉ place au hackathon sur 80 participants, PoC déployé en production sur Teams"
+    impact: "3ème place au hackathon sur 80 participants, PoC déployé en production sur Teams"
     sector: "Analytics"
 
   - id: exp3
     title: "Système Multi-Agents SentinelOne"
     client: "Hugging Face x Gradio"
-    client_logo: huggingface.png
+    client_logo: logos/clients/huggingface.png
     duration: "10 jours"
     date: "2025-03"
     period: "2025-04"
@@ -73,7 +70,7 @@ experiences:
   - id: exp4
     title: "Développement et déploiement servers MCP"
     client: "Confidential Transport Company"
-    client_logo: mcp.png
+    client_logo: logos/technologies/mcp.png
     duration: "4 mois"
     date: "2025-04"
     period: "2025-08"
@@ -97,7 +94,7 @@ experiences:
   - id: exp5
     title: "WavePPT - Serveur MCP génération PowerPoint"
     client: "Wavestone"
-    client_logo: wavestone.png
+    client_logo: logos/clients/wavestone.png
     duration: "4 mois"
     date: "2025-06"
     period: "2025-10"
@@ -120,7 +117,7 @@ experiences:
   - id: exp6
     title: "Dataiku Multi-Agent Workflow"
     client: "ALSTOM"
-    client_logo: alstom.png
+    client_logo: logos/clients/alstom.png
     duration: "4 mois"
     date: "2025-08"
     period: "2025-12"
@@ -184,7 +181,7 @@ certifications:
   - id: cert1
     name: "Azure AI Engineer Associate - AI-102"
     issuer: "Microsoft"
-    client_logo: azure_ai_cert.png
+    client_logo: logos/technologies/azure_ai_cert.png
     year: "2025"
     date: "2025-06"
     icon: "☁️"
@@ -193,7 +190,7 @@ certifications:
   - id: cert2
     name: "Dataiku GenAI Practitioner"
     issuer: "Dataiku"
-    client_logo: dataiku.png
+    client_logo: logos/technologies/dataiku.png
     year: "2025"
     date: "2025-07"
     icon: "📊"
@@ -202,7 +199,7 @@ certifications:
   - id: cert3
     name: "Hugging Face MCP Course"
     issuer: "Hugging Face"
-    client_logo: huggingface.png
+    client_logo: logos/technologies/huggingface.png
     year: "2025"
     date: "2025-08"
     icon: "🤗"
@@ -211,26 +208,32 @@ certifications:
 education:
   - id: edu1
     school: "Arts & Métiers ParisTech"
+    location: "Lille"
     degree: "Diplôme d'Ingénieur"
     year: "2019"
     date: "2019"
     icon: "🎓"
+    client_logo: logos/education/ensam.png
     achievement: "Classé 38/120, Médaille d'argent"
-    description: "🥈 Diplômé avec médaille d'argent, classé 38e sur 120 étudiants. Formation d'ingénieur généraliste avec spécialisation en informatique."
+    description: "Diplômé avec médaille d'argent, classé 38e sur 120 étudiants. Formation d'ingénieur généraliste avec spécialisation en informatique."
 
   - id: edu2
     school: "ETS Montréal"
+    location: "Montréal - Canada"
     degree: "Spécialisation Data Science"
     year: "2021"
     date: "2021"
-    icon: "🍁"
+    icon: "📊"
+    client_logo: logos/education/ets.png
     focus: "Machine Learning et Deep Learning"
     description: "Spécialisation en Data Science avec focus approfondi sur les techniques de Machine Learning et Deep Learning."
 
   - id: edu3
-    school: "Prépa PT* Jules Ferry - Versailles"
+    school: "Prépa PT* Jules Ferry"
+    location: "Versailles"
     degree: "Classes Préparatoires"
     year: "2017"
     date: "2017"
     icon: "📚"
+    client_logo: logos/education/jules_ferry.png
     description: "Classes préparatoires aux grandes écoles d'ingénieurs avec spécialisation en physique et technologie."

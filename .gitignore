@@ -41,12 +41,6 @@ wheels/
 .DS_Store
 Thumbs.db
 
-# Logos - do not commit to Git
-# They will be uploaded manually to Hugging Face Spaces
-logos/
-!logos/.gitkeep
-!logos/README_LOGOS.md
-
 # Logs
 *.log
 

@@ -2,6 +2,7 @@
 Premium GenAI Portfolio Application
 Deployed on Hugging Face Spaces with Gradio
 Enhanced with dark green/cream/gray premium design
+Version: 2.0 - Fixed UI issues and improved user experience
 """
 
 import gradio as gr
@@ -33,16 +34,20 @@ else:
     from litellm import completion
 
 
-# Load portfolio data from YAML file
 def load_portfolio_data() -> Dict:
-    """Load portfolio data from YAML configuration file"""
+    """
+    Load portfolio data from YAML configuration file
+
+    Returns:
+        Dict: Portfolio configuration including experiences, skills, certifications, education
+    """
     with open("portfolio_data.yaml", "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
 PORTFOLIO = load_portfolio_data()
 
-# Technology links for clickable logos
+# Technology links for clickable logos - comprehensive mapping
 TECH_LINKS = {
     "azure ai foundry": "https://ai.azure.com/",
     "azure ai search": "https://azure.microsoft.com/en-us/products/ai-services/ai-search/",
@@ -84,18 +89,16 @@ COLORS = {
     "shadow": "rgba(31, 65, 53, 0.1)",
 }
 
-# Custom CSS for premium stone-textured design
+# Custom CSS for premium stone-textured design with image fixes
 CUSTOM_CSS = f"""
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 .gradio-container {{
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-
-    /* Use absolute path served by HF/Gradio (leading slash), plus safe fallback */
     background-image: url('/logos/textures/metal_brushed.png') !important;
     background-color: {COLORS['background']};
     background-repeat: repeat;
-    background-size: auto;       /* keep natural pattern scale */
+    background-size: auto;
     background-position: center center !important;
     background-blend-mode: multiply;
     max-width: 1400px !important;
@@ -158,7 +161,7 @@ CUSTOM_CSS = f"""
     box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
 }}
 
-/* --- Carousel / card sizing improvements --- */
+/* Carousel / card sizing improvements */
 .carousel-wrapper {{
     display: flex;
     align-items: center;
@@ -170,8 +173,8 @@ CUSTOM_CSS = f"""
 }}
 
 .carousel-container {{
-    flex: 6;                         /* allow center column to take most space */
-    max-width: 1100px;               /* increase available card width */
+    flex: 6;
+    max-width: 1100px;
     width: 100%;
     display: flex;
     align-items: center;
@@ -186,7 +189,7 @@ CUSTOM_CSS = f"""
     border-radius: 24px;
     padding: 2.5rem;
     width: 100%;
-    max-width: 1000px;               /* wider card */
+    max-width: 1000px;
     min-height: 420px;
     box-shadow: 0 4px 20px {COLORS['shadow']}, 0 1px 3px rgba(0, 0, 0, 0.05);
     border: 1px solid {COLORS['border']};
@@ -212,6 +215,7 @@ CUSTOM_CSS = f"""
     border-bottom: 2px solid {COLORS['border']};
 }}
 
+/* Fixed logo container with proper aspect ratio preservation */
 .card-logo {{
     width: 80px;
     height: 80px;
@@ -225,11 +229,22 @@ CUSTOM_CSS = f"""
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     flex-shrink: 0;
     transition: all 0.3s ease;
+    overflow: hidden;
 }}
 
 .card-logo:hover {{
     border-color: {COLORS['primary_light']};
     box-shadow: 0 4px 12px {COLORS['shadow']};
+}}
+
+/* Fixed logo image aspect ratio */
+.card-logo img {{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 14px;
+    background: transparent;
+    padding: 6px;
 }}
 
 .card-title {{
@@ -264,6 +279,7 @@ CUSTOM_CSS = f"""
     margin-bottom: 1rem;
 }}
 
+/* Fixed tech badge images */
 .tech-badge {{
     display: inline-flex;
     align-items: center;
@@ -294,6 +310,17 @@ CUSTOM_CSS = f"""
     text-decoration: none;
 }}
 
+/* Fixed tech badge images with proper sizing */
+.tech-badge img {{
+    width: 28px;
+    height: 28px;
+    min-height: 28px;
+    max-height: 28px;
+    object-fit: contain;
+    border-radius: 4px;
+    display: block;
+}}
+
 .tech-badges-container {{
     display: flex;
     flex-wrap: wrap;
@@ -311,8 +338,8 @@ CUSTOM_CSS = f"""
     padding: 2.5rem 0;
     position: relative;
     margin-top: 2rem;
-    overflow-x: auto; /* Allow horizontal scrolling on mobile */
-    padding-bottom: 1.5rem; /* Add padding for scrollbar */
+    overflow-x: auto;
+    padding-bottom: 1.5rem;
 }}
 
 .timeline::before {{
@@ -339,8 +366,8 @@ CUSTOM_CSS = f"""
     transition: all 0.3s ease;
     position: relative;
     z-index: 1;
-    flex: 0 0 auto; /* Prevent shrinking */
-    min-width: 50px; /* Minimum width */
+    flex: 0 0 auto;
+    min-width: 50px;
 }}
 
 .timeline-dot {{
@@ -406,7 +433,7 @@ CUSTOM_CSS = f"""
     box-shadow: 0 6px 20px {COLORS['shadow']} !important;
 }}
 
-/* --- Carousel nav buttons: perfect circle, fixed size --- */
+/* Carousel nav buttons: perfect circle, fixed size */
 .carousel-nav-btn {{
     width: 56px !important;
     height: 56px !important;
@@ -432,7 +459,6 @@ CUSTOM_CSS = f"""
     overflow: hidden !important;
 }}
 
-/* Hover state for nav buttons */
 .carousel-nav-btn:hover {{
     background: {COLORS['primary']} !important;
     color: white !important;
@@ -496,11 +522,16 @@ CUSTOM_CSS = f"""
     gap: 1rem;
 }}
 
+/* Fixed wavebot logo proportions */
 .chat-header .wavebot-logo {{
     width: 48px;
     height: 48px;
     border-radius: 12px;
     flex-shrink: 0;
+    object-fit: contain;
+    padding: 4px;
+    background: white;
+    border: 1px solid {COLORS['border']};
 }}
 
 .chat-header .agent-name {{
@@ -609,7 +640,7 @@ input:focus, textarea:focus {{
     color: {COLORS['text_primary']} !important;
 }}
 
-/* Avatar styling */
+/* Avatar styling with better proportions */
 .avatar-container img {{
     border-radius: 8px !important;
     background: white !important;
@@ -631,7 +662,7 @@ input:focus, textarea:focus {{
 #send-btn {{
     height: 48px !important;
     min-height: 48px !important;
-    border-radius: 12px !important;    /* rounded rectangle */
+    border-radius: 12px !important;
     padding: 0 14px !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -683,25 +714,6 @@ input:focus, textarea:focus {{
     opacity: 1;
 }}
 
-.card-logo img {{
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* ensure logos keep aspect ratio */
-    border-radius: 14px; /* rounded corners for logos */
-    background: transparent;
-    padding: 6px;
-}}
-
-.tech-badge img {{
-    width: 28px;
-    height: 28px;
-    min-height: 28px;
-    max-height: 28px;
-    object-fit: contain;
-    border-radius: 4px;
-    display: block;
-}}
-
 /* Skill card specific styling */
 .skills-card-content {{
     display: grid;
@@ -722,6 +734,14 @@ input:focus, textarea:focus {{
 .skill-item:hover {{
     background: rgba(31, 65, 53, 0.1);
     transform: translateY(-2px);
+}}
+
+/* Education card specific styling */
+.card-location {{
+    color: {COLORS['text_muted']};
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-top: 0.25rem;
 }}
 
 /* Responsive adjustments */
@@ -832,29 +852,41 @@ input:focus, textarea:focus {{
 def embed_image_base64(rel_path: str) -> Optional[str]:
     """
     Convert a local image file into a base64-embedded data URI string.
-    Input: relative path to the image (repo root).
-    Output: 'data:image/...;base64,...' or None if not found.
+
+    Args:
+        rel_path (str): Relative path to the image from repo root
+
+    Returns:
+        Optional[str]: Base64 data URI string or None if file not found
     """
     abs_path = os.path.join(os.path.dirname(__file__), rel_path)
     if not os.path.exists(abs_path):
+        print(f"Warning: Image not found at {abs_path}")
         return None
+
     try:
         with open(abs_path, "rb") as f:
             encoded = base64.b64encode(f.read()).decode("utf-8")
+
+        # Determine MIME type based on file extension
         ext = os.path.splitext(rel_path)[1].lower()
-        mime = "image/png"
-        if ext == ".jpg" or ext == ".jpeg":
-            mime = "image/jpeg"
-        elif ext == ".svg":
-            mime = "image/svg+xml"
-        elif ext == ".webp":
-            mime = "image/webp"
+        mime_map = {
+            ".png": "image/png",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".svg": "image/svg+xml",
+            ".webp": "image/webp",
+            ".gif": "image/gif",
+        }
+        mime = mime_map.get(ext, "image/png")
+
         return f"data:{mime};base64,{encoded}"
-    except Exception:
+    except Exception as e:
+        print(f"Error encoding image {rel_path}: {e}")
         return None
 
 
-# SmolAgent tools
+# SmolAgent tools for portfolio interaction
 @tool
 def list_clement_experiences(
     technology: Optional[str] = None,
@@ -960,6 +992,8 @@ def list_clement_education() -> str:
     output = "Clement's Education:\n\n"
     for edu in education:
         output += f"**{edu['school']}** - {edu['degree']} ({edu['year']})\n"
+        if "location" in edu:
+            output += f"  Location: {edu['location']}\n"
         if "achievement" in edu:
             output += f"  Achievement: {edu['achievement']}\n"
         if "focus" in edu:
@@ -1134,32 +1168,44 @@ Answer questions professionally and highlight relevant experiences."""
 
 
 def generate_card_html(item: Dict, category: str) -> str:
-    """Generate HTML for a portfolio item card. Handles client + tech logos if present."""
+    """
+    Generate HTML for a portfolio item card with improved logo handling.
+
+    Args:
+        item (Dict): Portfolio item data
+        category (str): Category type (experiences, skills, certifications, education)
+
+    Returns:
+        str: Generated HTML for the card
+    """
     # Special handling for skills category
     if category == "skills":
         return generate_skills_card_html(item)
 
+    # Extract basic information
     icon = item.get("icon", "")
     title = item.get("title", "")
     name = item.get("name", "")  # For certifications
     subtitle = item.get("client", item.get("issuer", item.get("school", "")))
+    location = item.get("location", "")  # For education
     description = item.get("description", item.get("focus", ""))
     duration = item.get("duration", item.get("year", ""))
     techs = item.get("technologies", item.get("skills", []))
     impact = item.get("impact", "")
+    achievement = item.get("achievement", "")
 
-    # Find client/issuer/school logo - simplified logic using direct path
+    # Logo handling with better error management
     client_logo_url = None
-    if "client_logo" in item:
+    if "client_logo" in item and item["client_logo"]:
         logo_data = embed_image_base64(item["client_logo"])
         if logo_data:
             client_logo_url = logo_data
 
-    # Logo HTML - either image or emoji
+    # Logo HTML - either image or emoji fallback
     if client_logo_url:
         logo_html = f'<img src="{client_logo_url}" alt="{subtitle}" />'
     else:
-        # fallback emoji or icon
+        # Fallback emoji or icon
         logo_html = f'<div style="font-size: 2.2rem;">{icon or "📌"}</div>'
 
     # Generate tech badges with logos and clickable links
@@ -1195,7 +1241,7 @@ def generate_card_html(item: Dict, category: str) -> str:
             # Logo with link if available
             if tech_link != "#":
                 tech_badges_html.append(
-                    f'<a href="{tech_link}" target="_blank" class="tech-badge" title="{tech_name} - Cliquer pour visiter">'
+                    f'<a href="{tech_link}" target="_blank" class="tech-badge" title="{tech_name} - Click to visit">'
                     f'<img src="{logo_data}" alt="{tech_name}" /></a>'
                 )
             else:
@@ -1206,7 +1252,7 @@ def generate_card_html(item: Dict, category: str) -> str:
             # Fallback: show text
             if tech_link != "#":
                 tech_badges_html.append(
-                    f'<a href="{tech_link}" target="_blank" class="tech-badge" title="{tech_name} - Cliquer pour visiter">{tech_name}</a>'
+                    f'<a href="{tech_link}" target="_blank" class="tech-badge" title="{tech_name} - Click to visit">{tech_name}</a>'
                 )
             else:
                 tech_badges_html.append(
@@ -1220,12 +1266,20 @@ def generate_card_html(item: Dict, category: str) -> str:
         else ""
     )
 
-    # Build title section - for certifications, show name prominently
+    # Build title section with improved layout
     if category == "certifications" and name:
         title_section = f"""
             <div style="flex: 1;">
                 <div class="card-subtitle">{subtitle}</div>
                 <div class="card-title" style="margin-top: 0.5rem;">{name}</div>
+            </div>
+        """
+    elif category == "education":
+        title_section = f"""
+            <div style="flex: 1;">
+                <div class="card-title">{title}</div>
+                {f'<div class="card-subtitle">{subtitle}</div>' if subtitle else ''}
+                {f'<div class="card-location">{location}</div>' if location else ''}
             </div>
         """
     else:
@@ -1236,6 +1290,15 @@ def generate_card_html(item: Dict, category: str) -> str:
             </div>
         """
 
+    # Build meta information
+    meta_html = ""
+    if duration:
+        meta_html += f'<div class="card-meta">📅 {duration}</div>'
+    if impact:
+        meta_html += f'<div class="card-meta">🎯 {impact}</div>'
+    if achievement:
+        meta_html += f'<div class="card-meta">🏅 {achievement}</div>'
+
     # Return final card HTML
     return f"""
     <div class="card">
@@ -1244,15 +1307,22 @@ def generate_card_html(item: Dict, category: str) -> str:
             {title_section}
         </div>
         <div class="card-content">{description}</div>
-        {f'<div class="card-meta">📅 {duration}</div>' if duration else ''}
-        {f'<div class="card-meta">🎯 {impact}</div>' if impact else ''}
+        {meta_html}
         {tech_badges}
     </div>
     """
 
 
 def generate_skills_card_html(skill_category: Dict) -> str:
-    """Generate HTML specifically for skills cards"""
+    """
+    Generate HTML specifically for skills cards
+
+    Args:
+        skill_category (Dict): Skills category data
+
+    Returns:
+        str: Generated HTML for skills card
+    """
     category = skill_category.get("category", "")
     icon = skill_category.get("icon", "💡")
     skills = skill_category.get("skills", [])
@@ -1276,9 +1346,18 @@ def generate_skills_card_html(skill_category: Dict) -> str:
     """
 
 
-# Generate timeline HTML with click handlers
 def generate_timeline_html(items: List[Dict], active_index: int, category: str) -> str:
-    """Generate HTML for interactive timeline with chronological order"""
+    """
+    Generate HTML for interactive timeline with chronological order
+
+    Args:
+        items (List[Dict]): List of portfolio items
+        active_index (int): Index of currently active item
+        category (str): Category type
+
+    Returns:
+        str: Generated timeline HTML
+    """
     if not items:
         return '<div class="timeline">No items available</div>'
 
@@ -1305,9 +1384,13 @@ def generate_timeline_html(items: List[Dict], active_index: int, category: str) 
     return f'<div class="timeline">{"".join(timeline_items)}</div>'
 
 
-# Create Gradio interface
 def create_interface():
-    """Create the main Gradio interface"""
+    """
+    Create the main Gradio interface with improved functionality
+
+    Returns:
+        gr.Blocks: Configured Gradio interface
+    """
 
     with gr.Blocks(
         css=CUSTOM_CSS,
@@ -1320,7 +1403,7 @@ def create_interface():
         title="Clément Peponnet - Portfolio GenAI & Agentic",
     ) as app:
 
-        # State variables
+        # State variables for carousel navigation
         category_state = gr.State("experiences")
 
         # Get the most recent experience for initial display
@@ -1349,7 +1432,7 @@ def create_interface():
             </p>
             <p style="margin-top: 1rem; font-size: 1rem; opacity: 0.85;">
                 Convaincu par le potentiel de la GenAI, de l'Agentic AI, et du MCP<br>
-                j'accompagne mes clients du prototypage à l'industrialisation, pour maximiser l'impact métier​ de ces technologies.
+                j'accompagne mes clients du prototypage à l'industrialisation, pour maximiser l'impact métier de ces technologies.
             </p>
             <div class="social-links">
                 <a href="https://www.linkedin.com/in/clément-peponnet-b26906194" target="_blank" class="social-link">
@@ -1400,17 +1483,16 @@ def create_interface():
         # Navigation tabs
         with gr.Row():
             exp_btn = gr.Button("🚀 Expériences", elem_classes="nav-button")
-            skills_btn = gr.Button("💡 Expertise & Skills", elem_classes="nav-button")
             cert_btn = gr.Button("🏆 Certifications", elem_classes="nav-button")
+            skills_btn = gr.Button("💡 Expertise & Skills", elem_classes="nav-button")
             edu_btn = gr.Button("🎓 Études", elem_classes="nav-button")
 
         # Carousel display with proper alignment
         gr.HTML('<div style="margin: 3rem 0 1rem 0;"></div>')  # Spacer
 
-        # Make side buttons small and center column much wider so card gets enough room
+        # Carousel wrapper with improved layout
         with gr.Row(elem_classes="carousel-wrapper"):
             prev_btn = gr.Button("◀", elem_classes="carousel-nav-btn", scale=1)
-            # center column takes most space -> scale=6
             with gr.Column(scale=6, elem_classes="carousel-container"):
                 # Display the most recent experience initially
                 initial_experience = (
@@ -1423,7 +1505,7 @@ def create_interface():
                 )
             next_btn = gr.Button("▶", elem_classes="carousel-nav-btn", scale=1)
 
-        # Timeline with navigation hint
+        # Timeline with improved JavaScript integration
         timeline_html = gr.HTML(
             generate_timeline_html(
                 PORTFOLIO["experiences"], initial_index, "experiences"
@@ -1433,64 +1515,125 @@ def create_interface():
         # Hidden index input for JavaScript communication
         timeline_jump_index = gr.Number(value=-1, visible=False)
 
+        # Improved timeline JavaScript with better error handling
         gr.HTML(
             f"""
         <p style="text-align: center; color: {COLORS['text_muted']}; font-size: 0.85rem; margin-top: 1rem;">
             💡 Cliquez sur les points de la timeline ou utilisez les flèches ◀ ▶ pour naviguer
         </p>
         <script>
+        // Improved timeline navigation with better input detection
         window.jumpToCard = function(index) {{
             console.log('jumpToCard called with index:', index);
-            // Find the timeline jump input (should be the last number input that's hidden)
-            const allInputs = document.querySelectorAll('input[type="number"]');
+            
+            // Find the timeline jump input using multiple strategies
             let timelineInput = null;
             
-            // Look for the input that's in a hidden container
+            // Strategy 1: Find by being in a hidden container
+            const allInputs = document.querySelectorAll('input[type="number"]');
             for (let i = allInputs.length - 1; i >= 0; i--) {{
                 const input = allInputs[i];
-                const container = input.closest('.gr-form');
-                if (container && container.style.display === 'none') {{
+                const container = input.closest('.gradio-container');
+                const parent = input.parentElement;
+                
+                // Check if it's hidden (display: none or visibility: hidden)
+                if (parent && (parent.style.display === 'none' || parent.style.visibility === 'hidden')) {{
+                    timelineInput = input;
+                    break;
+                }}
+                
+                // Check if it has value -1 (our default)
+                if (input.value === '-1') {{
                     timelineInput = input;
                     break;
                 }}
             }}
             
+            // Strategy 2: If not found, try finding by closest to timeline
+            if (!timelineInput) {{
+                const timelineElement = document.querySelector('.timeline');
+                if (timelineElement) {{
+                    const nearbyInputs = timelineElement.parentElement.querySelectorAll('input[type="number"]');
+                    if (nearbyInputs.length > 0) {{
+                        timelineInput = nearbyInputs[nearbyInputs.length - 1];
+                    }}
+                }}
+            }}
+            
             if (timelineInput) {{
                 console.log('Found timeline input, setting value to:', index);
+                
+                // Set the value
                 timelineInput.value = index;
                 
-                // Trigger multiple events to ensure Gradio picks it up
-                timelineInput.dispatchEvent(new Event('input', {{ bubbles: true }}));
-                timelineInput.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                // Trigger events with delay to ensure proper handling
+                setTimeout(() => {{
+                    timelineInput.dispatchEvent(new Event('input', {{ bubbles: true, cancelable: true }}));
+                }}, 10);
                 
-                // Alternative method using Gradio's internal event system
-                if (window.gradio && window.gradio.dispatch) {{
-                    window.gradio.dispatch('change', timelineInput);
-                }}
+                setTimeout(() => {{
+                    timelineInput.dispatchEvent(new Event('change', {{ bubbles: true, cancelable: true }}));
+                }}, 20);
+                
+                // Additional Gradio-specific event triggering
+                setTimeout(() => {{
+                    if (window.gradio_config && window.gradio_config.fn_index) {{
+                        // Try to find and trigger the associated Gradio function
+                        const event = new CustomEvent('gradio_event', {{
+                            detail: {{ target: timelineInput, value: index }}
+                        }});
+                        document.dispatchEvent(event);
+                    }}
+                }}, 30);
+                
             }} else {{
-                console.error('Timeline input not found');
+                console.error('Timeline input not found. Available inputs:');
+                document.querySelectorAll('input[type="number"]').forEach((input, i) => {{
+                    console.log(`Input ${{i}}:`, input, 'Value:', input.value, 'Visible:', input.offsetParent !== null);
+                }});
             }}
         }}
         
-        // Debug function to check inputs
-        window.debugInputs = function() {{
+        // Debug function to analyze inputs
+        window.debugTimelineInputs = function() {{
+            console.log('=== Timeline Input Debug ===');
             const inputs = document.querySelectorAll('input[type="number"]');
-            console.log('Found', inputs.length, 'number inputs:');
+            console.log('Total number inputs found:', inputs.length);
+            
             inputs.forEach((input, i) => {{
-                const container = input.closest('.gr-form');
+                const parent = input.parentElement;
+                const isHidden = parent && (parent.style.display === 'none' || parent.style.visibility === 'hidden');
                 console.log(`Input ${{i}}:`, {{
+                    element: input,
                     value: input.value,
-                    hidden: container ? container.style.display === 'none' : false,
-                    element: input
+                    hidden: isHidden,
+                    offsetParent: input.offsetParent,
+                    classList: input.classList.toString(),
+                    parentElement: parent
                 }});
             }});
         }}
+        
+        // Auto-debug on load
+        setTimeout(() => {{
+            console.log('Timeline navigation system initialized');
+            window.debugTimelineInputs();
+        }}, 1000);
         </script>
         """
         )
 
-        # Navigation functions
+        # Navigation functions with improved error handling
         def update_category(category: str):
+            """
+            Update the displayed category and show the most recent item
+
+            Args:
+                category (str): Category to display
+
+            Returns:
+                Tuple: Updated HTML, timeline, category state, index state, jump index
+            """
             items = PORTFOLIO.get(category, [])
             if items:
                 # Sort items by date to get the most recent first
@@ -1509,6 +1652,17 @@ def create_interface():
             return carousel_html.value, timeline_html.value, category, 0, -1
 
         def navigate_carousel(direction: int, category: str, current_index: int):
+            """
+            Navigate through carousel items
+
+            Args:
+                direction (int): Navigation direction (-1 for previous, 1 for next)
+                category (str): Current category
+                current_index (int): Current item index
+
+            Returns:
+                Tuple: Updated HTML, timeline, new index, jump index
+            """
             items = PORTFOLIO.get(category, [])
             if not items:
                 return carousel_html.value, timeline_html.value, current_index, -1
@@ -1519,14 +1673,28 @@ def create_interface():
             return card, timeline, new_index, -1
 
         def jump_to_timeline_index(jump_index: int, category: str, current_index: int):
-            """Handle timeline click navigation"""
+            """
+            Handle timeline click navigation with improved error handling
+
+            Args:
+                jump_index (int): Target index from timeline click
+                category (str): Current category
+                current_index (int): Current item index
+
+            Returns:
+                Tuple: Updated HTML, timeline, new index, reset jump index
+            """
             if jump_index < 0:  # No jump requested
                 return carousel_html.value, timeline_html.value, current_index, -1
 
             items = PORTFOLIO.get(category, [])
             if not items or jump_index >= len(items):
+                print(
+                    f"Warning: Invalid jump index {jump_index} for category {category}"
+                )
                 return carousel_html.value, timeline_html.value, current_index, -1
 
+            print(f"Jumping to index {jump_index} in category {category}")
             card = generate_card_html(items[jump_index], category)
             timeline = generate_timeline_html(items, jump_index, category)
             return card, timeline, jump_index, -1
@@ -1584,14 +1752,14 @@ def create_interface():
             outputs=[carousel_html, timeline_html, index_state, timeline_jump_index],
         )
 
-        # Timeline click handler
+        # Timeline click handler with improved debugging
         timeline_jump_index.change(
             jump_to_timeline_index,
             inputs=[timeline_jump_index, category_state, index_state],
             outputs=[carousel_html, timeline_html, index_state, timeline_jump_index],
         )
 
-        # Chat interface
+        # Chat interface with fixed wavebot logo
         wavebot_logo = embed_image_base64("logos/technologies/wavebot.png")
         wavebot_img = (
             f'<img src="{wavebot_logo}" class="wavebot-logo" alt="WaveBot" />'
@@ -1612,7 +1780,7 @@ def create_interface():
         """
         )
 
-        # Create a nice and unique chatbot avatar URL using the wavebot.png logo
+        # Create chatbot with proper avatar
         chatbot_avatar = os.path.join(logos_path, "technologies", "wavebot.png")
 
         chatbot = gr.Chatbot(
@@ -1630,8 +1798,8 @@ def create_interface():
                 scale=10,
                 lines=1,
                 show_label=False,
-                container=True,  # keep consistent container to avoid odd sizing
-                elem_id="msg-input",  # used by the CSS above
+                container=True,
+                elem_id="msg-input",
             )
 
             send_btn = gr.Button(
@@ -1639,7 +1807,7 @@ def create_interface():
                 variant="primary",
                 scale=1,
                 size="md",
-                elem_id="send-btn",  # matches CSS
+                elem_id="send-btn",
             )
 
         gr.Examples(
@@ -1656,7 +1824,7 @@ def create_interface():
         msg.submit(chat_with_agent, [msg, chatbot], [msg, chatbot])
         send_btn.click(chat_with_agent, [msg, chatbot], [msg, chatbot])
 
-        # Footer
+        # Footer with model information
         if USE_HF_MODEL:
             model_info = "SmolAgent + Qwen2.5-Coder-32B (HuggingFace)"
         elif USE_SMOLAGENT_WITH_LITELLM:
