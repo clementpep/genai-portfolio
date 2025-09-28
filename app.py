@@ -1261,7 +1261,7 @@ def create_interface():
             <div class="stat-card">
                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">🥇</div>
                 <div class="stat-value">2</div>
-                <div class="stat-label">Hackathons (gagnés/particip.)</div>
+                <div class="stat-label">Hackathons</div>
             </div>
             <div class="stat-card">
                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">💼</div>
@@ -1425,10 +1425,10 @@ def create_interface():
                 <line x1="8" y1="16" x2="8" y2="16"></line>
                 <line x1="16" y1="16" x2="16" y2="16"></line>
             </svg>
-            <span>AI Agent specialized in Clément's profile</span>
+            <span>PeponeAgent - Un agent IA spécialisé sur mon profil</span>
         </div>
         <p style="color: {COLORS['text_secondary']}; margin-bottom: 1.5rem; font-size: 0.95rem;">
-            Posez vos questions sur le profil, les expériences GenAI, les compétences techniques ou demandez une analyse de correspondance avec vos besoins.
+            Posez-lui vos questions sur mon profil, mes expériences GenAI & Agentic, mes compétences techniques ou demandez-lui une analyse de correspondance avec vos besoins.
         </p>
         """
         )

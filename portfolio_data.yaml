@@ -29,7 +29,7 @@ experiences:
     title: "PoC GenAI Analyse Enquêtes Satisfaction – Hackathon Microsoft x ENGIE"
     client: "ENGIE (Hackathon Microsoft)"
     client_logo: engie.png
-    duration: "1 semaine"
+    duration: "3 jours"
     date: "2024-03"
     period: "2024-03"
     icon: "💬"
@@ -53,7 +53,7 @@ experiences:
     title: "Système Multi-Agents SentinelOne"
     client: "Hugging Face x Gradio"
     client_logo: huggingface.png
-    duration: "Hackathon"
+    duration: "10 jours"
     date: "2025-03"
     period: "2025-04"
     icon: "🏆"
@@ -186,7 +186,7 @@ certifications:
     name: "Azure AI Engineer Associate - AI-102"
     issuer: "Microsoft"
     year: "2025"
-    date: "2025"
+    date: "2025-06"
     icon: "☁️"
     description: "Certification officielle Microsoft pour la conception et l'implémentation de solutions IA utilisant les services Azure AI."
 
@@ -194,7 +194,7 @@ certifications:
     name: "Dataiku GenAI Practitioner"
     issuer: "Dataiku"
     year: "2025"
-    date: "2025"
+    date: "2025-07"
     icon: "📊"
     description: "Spécialisation GenAI sur plateforme Dataiku, incluant LLM Mesh et systèmes multi-agents."
 
@@ -202,7 +202,7 @@ certifications:
     name: "Hugging Face MCP Course"
     issuer: "Hugging Face"
     year: "2025"
-    date: "2025"
+    date: "2025-08"
     icon: "🤗"
     description: "Formation avancée sur l'implémentation du Model Context Protocol (MCP) et les bonnes pratiques Hugging Face."
 

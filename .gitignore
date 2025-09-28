@@ -1,5 +1,55 @@
-node_modules
-__pycache__
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.gradio
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment variables
 .env
 .venv
-*.pem
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logos - do not commit to Git
+# They will be uploaded manually to Hugging Face Spaces
+logos/
+!logos/.gitkeep
+!logos/README_LOGOS.md
+
+# Logs
+*.log
+
+# Gradio
+gradio_cached_examples/
+flagged/
