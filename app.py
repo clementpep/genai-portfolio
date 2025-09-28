@@ -2,7 +2,7 @@
 Premium GenAI Portfolio Application
 Deployed on Hugging Face Spaces with Gradio
 Enhanced with dark green/cream/gray premium design
-Version: 2.0 - Fixed UI issues and improved user experience
+Version: 2.1 - Fixed timeline navigation and HF model fallback system
 """
 
 import gradio as gr
@@ -11,6 +11,8 @@ import os
 import base64
 from typing import List, Dict, Optional, Tuple
 from dotenv import load_dotenv
+import requests
+import time
 
 # Load environment variables
 load_dotenv()
@@ -22,6 +24,19 @@ USE_HF_MODEL = os.getenv("USE_HF_MODEL", "true").lower() == "true"
 USE_SMOLAGENT_WITH_LITELLM = (
     os.getenv("USE_SMOLAGENT_WITH_LITELLM", "false").lower() == "true"
 )
+
+# Free HuggingFace models to try in order of preference
+FREE_HF_MODELS = [
+    "Qwen/Qwen2.5-Coder-32B-Instruct" "microsoft/DialoGPT-medium",
+    "microsoft/DialoGPT-small",
+    "google/flan-t5-base",
+    "google/flan-t5-small",
+    "HuggingFaceH4/zephyr-7b-beta",
+    "mistralai/Mistral-7B-Instruct-v0.1",
+    "microsoft/DialoGPT-large",
+    "facebook/blenderbot-400M-distill",
+    "facebook/blenderbot_small-90M",
+]
 
 if USE_HF_MODEL or USE_SMOLAGENT_WITH_LITELLM:
     from smolagents import CodeAgent, tool
@@ -358,6 +373,23 @@ CUSTOM_CSS = f"""
     z-index: 0;
 }}
 
+/* Timeline buttons - invisible but clickable */
+.timeline-btn {{
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+}}
+
+.timeline-btn:hover {{
+    background: transparent !important;
+    transform: none !important;
+}}
+
 .timeline-item {{
     display: flex;
     flex-direction: column;
@@ -569,27 +601,6 @@ button.primary:hover {{
     box-shadow: 0 0 0 3px rgba(31, 65, 53, 0.1) !important;
 }}
 
-/* Smooth scrollbar */
-::-webkit-scrollbar {{
-    width: 10px;
-    height: 10px;
-}}
-
-::-webkit-scrollbar-track {{
-    background: {COLORS['background']};
-    border-radius: 5px;
-}}
-
-::-webkit-scrollbar-thumb {{
-    background: {COLORS['border']};
-    border-radius: 5px;
-    transition: background 0.3s ease;
-}}
-
-::-webkit-scrollbar-thumb:hover {{
-    background: {COLORS['primary']};
-}}
-
 /* Footer styling */
 .footer {{
     text-align: center;
@@ -600,65 +611,7 @@ button.primary:hover {{
     border-radius: 24px;
 }}
 
-/* Improved button transitions */
-button {{
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}}
-
-/* Better input focus states */
-input:focus, textarea:focus {{
-    outline: none !important;
-}}
-
-/* Chatbot improvements */
-.chatbot {{
-    border: 2px solid {COLORS['border']} !important;
-    border-radius: 16px !important;
-}}
-
-/* Message styling with proper text colors */
-.message {{
-    margin: 0.5rem 0 !important;
-    border-radius: 16px !important;
-}}
-
-.message.user {{
-    background: linear-gradient(135deg, {COLORS['gradient_start']}, {COLORS['gradient_end']}) !important;
-}}
-
-.message.user p, .message.user span, .message.user div {{
-    color: white !important;
-}}
-
-.message.bot {{
-    background: {COLORS['surface']} !important;
-    border: 1px solid {COLORS['border']} !important;
-    color: {COLORS['text_primary']} !important;
-}}
-
-.message.bot p, .message.bot span, .message.bot div {{
-    color: {COLORS['text_primary']} !important;
-}}
-
-/* Avatar styling with better proportions */
-.avatar-container img {{
-    border-radius: 8px !important;
-    background: white !important;
-    padding: 4px !important;
-    width: 32px !important;
-    height: 32px !important;
-    object-fit: contain !important;
-}}
-
 /* Send button styling */
-#msg-input {{
-    height: 48px !important;
-    min-height: 48px !important;
-    border-radius: 12px !important;
-    padding: 0.6rem 0.85rem !important;
-    box-sizing: border-box !important;
-}}
-
 #send-btn {{
     height: 48px !important;
     min-height: 48px !important;
@@ -690,10 +643,6 @@ input:focus, textarea:focus {{
     }}
 }}
 
-/* Row and column improvements */
-.gr-row *[id="msg-input"], .gr-row *[id="send-btn"] {{
-    vertical-align: middle;
-}}
 
 /* Better card shadows on hover */
 .card::after {{
@@ -809,7 +758,7 @@ input:focus, textarea:focus {{
     }}
 }}
 
-/* Fix specifically for skills cards */
+/* Skills card styling */
 .category-title {{
     font-family: 'Playfair Display', serif;
     font-size: 1.5rem;
@@ -846,7 +795,72 @@ input:focus, textarea:focus {{
     color: {COLORS['primary']};
     font-weight: bold;
 }}
+
 """
+
+
+def test_hf_model(model_name: str, hf_token: str) -> bool:
+    """
+    Test if a HuggingFace model is available and has credits
+
+    Args:
+        model_name (str): Name of the HF model to test
+        hf_token (str): HuggingFace API token
+
+    Returns:
+        bool: True if model is available and working
+    """
+    try:
+        # Try to create a simple inference client model
+        from smolagents import InferenceClientModel
+
+        model = InferenceClientModel(
+            model_id=model_name,
+            temperature=0.7,
+            token=hf_token,
+        )
+
+        # Test with a simple prompt
+        test_response = model.complete("Hello", max_tokens=10)
+
+        print(f"✅ Model {model_name} is working")
+        return True
+
+    except Exception as e:
+        error_str = str(e)
+        if (
+            "402" in error_str
+            or "Payment Required" in error_str
+            or "exceeded" in error_str
+        ):
+            print(f"❌ Model {model_name} has no credits left")
+        elif "404" in error_str or "not found" in error_str:
+            print(f"❌ Model {model_name} not found")
+        else:
+            print(f"❌ Model {model_name} failed: {error_str}")
+        return False
+
+
+def get_working_hf_model(hf_token: str) -> Optional[str]:
+    """
+    Find the first working HuggingFace model from the list
+
+    Args:
+        hf_token (str): HuggingFace API token
+
+    Returns:
+        Optional[str]: Name of working model or None
+    """
+    print("🔍 Testing HuggingFace models for available credits...")
+
+    for model_name in FREE_HF_MODELS:
+        print(f"Testing {model_name}...")
+        if test_hf_model(model_name, hf_token):
+            return model_name
+        time.sleep(1)  # Small delay between tests
+
+    print("❌ No working HuggingFace models found with available credits")
+    return None
 
 
 def embed_image_base64(rel_path: str) -> Optional[str]:
@@ -1059,26 +1073,36 @@ def analyze_profile_match(requirements: str) -> str:
     return output
 
 
-# Initialize agent based on environment
+# Initialize agent based on environment with fallback system
 if USE_HF_MODEL:
-    # SmolAgent with HuggingFace (FREE)
-    model = InferenceClientModel(
-        model_id="Qwen/Qwen2.5-Coder-32B-Instruct",
-        temperature=0.7,
-        token=os.getenv("HF_TOKEN"),
-    )
-    agent = CodeAgent(
-        model=model,
-        tools=[
-            list_clement_experiences,
-            list_clement_skills,
-            list_clement_certifications,
-            list_clement_education,
-            analyze_profile_match,
-        ],
-        max_steps=6,
-        verbosity_level=0,
-    )
+    # SmolAgent with HuggingFace (FREE) - with fallback
+    hf_token = os.getenv("HF_TOKEN")
+    working_model = get_working_hf_model(hf_token) if hf_token else None
+
+    if working_model:
+        print(f"✅ Using HuggingFace model: {working_model}")
+        model = InferenceClientModel(
+            model_id=working_model,
+            temperature=0.7,
+            token=hf_token,
+        )
+        agent = CodeAgent(
+            model=model,
+            tools=[
+                list_clement_experiences,
+                list_clement_skills,
+                list_clement_certifications,
+                list_clement_education,
+                analyze_profile_match,
+            ],
+            max_steps=6,
+            verbosity_level=0,
+        )
+    else:
+        print("❌ No working HF models found, falling back to LiteLLM")
+        agent = None
+        USE_HF_MODEL = False
+
 elif USE_SMOLAGENT_WITH_LITELLM:
     # SmolAgent with LiteLLM backend (PAID but with tools)
     model = LiteLLMModel(
@@ -1105,7 +1129,7 @@ else:
 
 def chat_with_agent(message: str, history: List) -> Tuple[str, List]:
     """
-    Process chat message using SmolAgent or LiteLLM
+    Process chat message using SmolAgent or LiteLLM with improved error handling
 
     Args:
         message: User's message
@@ -1115,8 +1139,16 @@ def chat_with_agent(message: str, history: List) -> Tuple[str, List]:
         Tuple of (empty string for input, updated history)
     """
     try:
-        if USE_HF_MODEL or USE_SMOLAGENT_WITH_LITELLM:
-            # Use SmolAgent (with HF or LiteLLM backend)
+        if USE_HF_MODEL and agent:
+            # Use SmolAgent with HF model
+            result = agent.run(message)
+            response = (
+                result.get("output", str(result))
+                if isinstance(result, dict)
+                else str(result)
+            )
+        elif USE_SMOLAGENT_WITH_LITELLM and agent:
+            # Use SmolAgent with LiteLLM backend
             result = agent.run(message)
             response = (
                 result.get("output", str(result))
@@ -1346,9 +1378,11 @@ def generate_skills_card_html(skill_category: Dict) -> str:
     """
 
 
-def generate_timeline_html(items: List[Dict], active_index: int, category: str) -> str:
+def generate_timeline_with_buttons(
+    items: List[Dict], active_index: int, category: str
+) -> Tuple[str, List[gr.Button]]:
     """
-    Generate HTML for interactive timeline with chronological order
+    Generate HTML for timeline with invisible Gradio buttons for each item
 
     Args:
         items (List[Dict]): List of portfolio items
@@ -1356,10 +1390,10 @@ def generate_timeline_html(items: List[Dict], active_index: int, category: str) 
         category (str): Category type
 
     Returns:
-        str: Generated timeline HTML
+        Tuple[str, List[gr.Button]]: Timeline HTML and list of invisible buttons
     """
     if not items:
-        return '<div class="timeline">No items available</div>'
+        return '<div class="timeline">No items available</div>', []
 
     # Sort items by date chronologically (oldest to newest)
     sorted_items = sorted(
@@ -1368,25 +1402,32 @@ def generate_timeline_html(items: List[Dict], active_index: int, category: str) 
     )
 
     timeline_items = []
+    buttons = []
+
     for idx, (original_index, item) in enumerate(sorted_items):
         date = item.get("date", item.get("year", item.get("period", "")))
         active_class = "active" if original_index == active_index else ""
 
+        # Create invisible button for this timeline item
+        btn_id = f"timeline-btn-{original_index}"
+
         timeline_items.append(
             f"""
-        <div class="timeline-item {active_class}" data-index="{original_index}" onclick="window.jumpToCard({original_index})">
+        <div class="timeline-item {active_class}" onclick="document.getElementById('{btn_id}').click()">
             <div class="timeline-dot"></div>
             <div class="timeline-label">{date}</div>
         </div>
         """
         )
 
-    return f'<div class="timeline">{"".join(timeline_items)}</div>'
+    timeline_html = f'<div class="timeline">{"".join(timeline_items)}</div>'
+
+    return timeline_html, buttons
 
 
 def create_interface():
     """
-    Create the main Gradio interface with improved functionality
+    Create the main Gradio interface with fixed timeline functionality
 
     Returns:
         gr.Blocks: Configured Gradio interface
@@ -1483,8 +1524,8 @@ def create_interface():
         # Navigation tabs
         with gr.Row():
             exp_btn = gr.Button("🚀 Expériences", elem_classes="nav-button")
-            cert_btn = gr.Button("🏆 Certifications", elem_classes="nav-button")
             skills_btn = gr.Button("💡 Expertise & Skills", elem_classes="nav-button")
+            cert_btn = gr.Button("🏆 Certifications", elem_classes="nav-button")
             edu_btn = gr.Button("🎓 Études", elem_classes="nav-button")
 
         # Carousel display with proper alignment
@@ -1505,258 +1546,216 @@ def create_interface():
                 )
             next_btn = gr.Button("▶", elem_classes="carousel-nav-btn", scale=1)
 
-        # Timeline with improved JavaScript integration
-        timeline_html = gr.HTML(
-            generate_timeline_html(
-                PORTFOLIO["experiences"], initial_index, "experiences"
+        # Create timeline with invisible buttons for navigation
+        with gr.Column():
+            # Timeline HTML display
+            timeline_html = gr.HTML()
+
+            # Create invisible buttons for each timeline item
+            timeline_buttons = []
+            max_items = max(
+                len(PORTFOLIO.get("experiences", [])),
+                len(PORTFOLIO.get("skills", [])),
+                len(PORTFOLIO.get("certifications", [])),
+                len(PORTFOLIO.get("education", [])),
             )
-        )
 
-        # Hidden index input for JavaScript communication
-        timeline_jump_index = gr.Number(value=-1, visible=False)
+            # Create buttons in a hidden row
+            with gr.Row(visible=False):
+                for i in range(max_items):
+                    btn = gr.Button(
+                        f"Timeline {i}",
+                        elem_id=f"timeline-btn-{i}",
+                        elem_classes="timeline-btn",
+                    )
+                    timeline_buttons.append(btn)
 
-        # Improved timeline JavaScript with better error handling
-        gr.HTML(
-            f"""
-        <p style="text-align: center; color: {COLORS['text_muted']}; font-size: 0.85rem; margin-top: 1rem;">
-            💡 Cliquez sur les points de la timeline ou utilisez les flèches ◀ ▶ pour naviguer
-        </p>
-        <script>
-        // Improved timeline navigation with better input detection
-        window.jumpToCard = function(index) {{
-            console.log('jumpToCard called with index:', index);
-            
-            // Find the timeline jump input using multiple strategies
-            let timelineInput = null;
-            
-            // Strategy 1: Find by being in a hidden container
-            const allInputs = document.querySelectorAll('input[type="number"]');
-            for (let i = allInputs.length - 1; i >= 0; i--) {{
-                const input = allInputs[i];
-                const container = input.closest('.gradio-container');
-                const parent = input.parentElement;
-                
-                // Check if it's hidden (display: none or visibility: hidden)
-                if (parent && (parent.style.display === 'none' || parent.style.visibility === 'hidden')) {{
-                    timelineInput = input;
-                    break;
-                }}
-                
-                // Check if it has value -1 (our default)
-                if (input.value === '-1') {{
-                    timelineInput = input;
-                    break;
-                }}
-            }}
-            
-            // Strategy 2: If not found, try finding by closest to timeline
-            if (!timelineInput) {{
-                const timelineElement = document.querySelector('.timeline');
-                if (timelineElement) {{
-                    const nearbyInputs = timelineElement.parentElement.querySelectorAll('input[type="number"]');
-                    if (nearbyInputs.length > 0) {{
-                        timelineInput = nearbyInputs[nearbyInputs.length - 1];
-                    }}
-                }}
-            }}
-            
-            if (timelineInput) {{
-                console.log('Found timeline input, setting value to:', index);
-                
-                // Set the value
-                timelineInput.value = index;
-                
-                // Trigger events with delay to ensure proper handling
-                setTimeout(() => {{
-                    timelineInput.dispatchEvent(new Event('input', {{ bubbles: true, cancelable: true }}));
-                }}, 10);
-                
-                setTimeout(() => {{
-                    timelineInput.dispatchEvent(new Event('change', {{ bubbles: true, cancelable: true }}));
-                }}, 20);
-                
-                // Additional Gradio-specific event triggering
-                setTimeout(() => {{
-                    if (window.gradio_config && window.gradio_config.fn_index) {{
-                        // Try to find and trigger the associated Gradio function
-                        const event = new CustomEvent('gradio_event', {{
-                            detail: {{ target: timelineInput, value: index }}
-                        }});
-                        document.dispatchEvent(event);
-                    }}
-                }}, 30);
-                
-            }} else {{
-                console.error('Timeline input not found. Available inputs:');
-                document.querySelectorAll('input[type="number"]').forEach((input, i) => {{
-                    console.log(`Input ${{i}}:`, input, 'Value:', input.value, 'Visible:', input.offsetParent !== null);
-                }});
-            }}
-        }}
-        
-        // Debug function to analyze inputs
-        window.debugTimelineInputs = function() {{
-            console.log('=== Timeline Input Debug ===');
-            const inputs = document.querySelectorAll('input[type="number"]');
-            console.log('Total number inputs found:', inputs.length);
-            
-            inputs.forEach((input, i) => {{
-                const parent = input.parentElement;
-                const isHidden = parent && (parent.style.display === 'none' || parent.style.visibility === 'hidden');
-                console.log(`Input ${{i}}:`, {{
-                    element: input,
-                    value: input.value,
-                    hidden: isHidden,
-                    offsetParent: input.offsetParent,
-                    classList: input.classList.toString(),
-                    parentElement: parent
-                }});
-            }});
-        }}
-        
-        // Auto-debug on load
-        setTimeout(() => {{
-            console.log('Timeline navigation system initialized');
-            window.debugTimelineInputs();
-        }}, 1000);
-        </script>
-        """
-        )
+        # Initialize timeline display
+        def init_timeline():
+            items = PORTFOLIO.get("experiences", [])
+            sorted_items = sorted(
+                enumerate(items),
+                key=lambda x: x[1].get(
+                    "date", x[1].get("year", x[1].get("period", "0000"))
+                ),
+            )
+
+            timeline_items_html = []
+            for idx, (original_index, item) in enumerate(sorted_items):
+                date = item.get("date", item.get("year", item.get("period", "")))
+                active_class = "active" if original_index == initial_index else ""
+
+                timeline_items_html.append(
+                    f"""
+                <div class="timeline-item {active_class}" onclick="document.getElementById('timeline-btn-{original_index}').click()">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">{date}</div>
+                </div>
+                """
+                )
+
+            return f'<div class="timeline">{"".join(timeline_items_html)}</div>'
+
+        # Set initial timeline
+        timeline_html.value = init_timeline()
 
         # Navigation functions with improved error handling
         def update_category(category: str):
-            """
-            Update the displayed category and show the most recent item
-
-            Args:
-                category (str): Category to display
-
-            Returns:
-                Tuple: Updated HTML, timeline, category state, index state, jump index
-            """
+            """Update the displayed category and show the most recent item"""
             items = PORTFOLIO.get(category, [])
             if items:
-                # Sort items by date to get the most recent first
                 sorted_items = sorted(
                     items,
                     key=lambda x: x.get("date", x.get("year", x.get("period", "0000"))),
-                    reverse=True,  # Most recent first
+                    reverse=True,
                 )
-                # Use the original index of the most recent item
                 most_recent_item = sorted_items[0]
                 most_recent_index = items.index(most_recent_item)
 
                 card = generate_card_html(most_recent_item, category)
-                timeline = generate_timeline_html(items, most_recent_index, category)
-                return card, timeline, category, most_recent_index, -1
-            return carousel_html.value, timeline_html.value, category, 0, -1
+
+                # Generate timeline HTML
+                sorted_for_timeline = sorted(
+                    enumerate(items),
+                    key=lambda x: x[1].get(
+                        "date", x[1].get("year", x[1].get("period", "0000"))
+                    ),
+                )
+
+                timeline_items_html = []
+                for idx, (original_index, item) in enumerate(sorted_for_timeline):
+                    date = item.get("date", item.get("year", item.get("period", "")))
+                    active_class = (
+                        "active" if original_index == most_recent_index else ""
+                    )
+
+                    timeline_items_html.append(
+                        f"""
+                    <div class="timeline-item {active_class}" onclick="document.getElementById('timeline-btn-{original_index}').click()">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-label">{date}</div>
+                    </div>
+                    """
+                    )
+
+                timeline = f'<div class="timeline">{"".join(timeline_items_html)}</div>'
+
+                return card, timeline, category, most_recent_index
+            return carousel_html.value, timeline_html.value, category, 0
 
         def navigate_carousel(direction: int, category: str, current_index: int):
-            """
-            Navigate through carousel items
-
-            Args:
-                direction (int): Navigation direction (-1 for previous, 1 for next)
-                category (str): Current category
-                current_index (int): Current item index
-
-            Returns:
-                Tuple: Updated HTML, timeline, new index, jump index
-            """
+            """Navigate through carousel items"""
             items = PORTFOLIO.get(category, [])
             if not items:
-                return carousel_html.value, timeline_html.value, current_index, -1
+                return carousel_html.value, timeline_html.value, current_index
 
             new_index = (current_index + direction) % len(items)
             card = generate_card_html(items[new_index], category)
-            timeline = generate_timeline_html(items, new_index, category)
-            return card, timeline, new_index, -1
 
-        def jump_to_timeline_index(jump_index: int, category: str, current_index: int):
-            """
-            Handle timeline click navigation with improved error handling
+            # Update timeline
+            sorted_for_timeline = sorted(
+                enumerate(items),
+                key=lambda x: x[1].get(
+                    "date", x[1].get("year", x[1].get("period", "0000"))
+                ),
+            )
 
-            Args:
-                jump_index (int): Target index from timeline click
-                category (str): Current category
-                current_index (int): Current item index
+            timeline_items_html = []
+            for idx, (original_index, item) in enumerate(sorted_for_timeline):
+                date = item.get("date", item.get("year", item.get("period", "")))
+                active_class = "active" if original_index == new_index else ""
 
-            Returns:
-                Tuple: Updated HTML, timeline, new index, reset jump index
-            """
-            if jump_index < 0:  # No jump requested
-                return carousel_html.value, timeline_html.value, current_index, -1
-
-            items = PORTFOLIO.get(category, [])
-            if not items or jump_index >= len(items):
-                print(
-                    f"Warning: Invalid jump index {jump_index} for category {category}"
+                timeline_items_html.append(
+                    f"""
+                <div class="timeline-item {active_class}" onclick="document.getElementById('timeline-btn-{original_index}').click()">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">{date}</div>
+                </div>
+                """
                 )
-                return carousel_html.value, timeline_html.value, current_index, -1
 
-            print(f"Jumping to index {jump_index} in category {category}")
-            card = generate_card_html(items[jump_index], category)
-            timeline = generate_timeline_html(items, jump_index, category)
-            return card, timeline, jump_index, -1
+            timeline = f'<div class="timeline">{"".join(timeline_items_html)}</div>'
+
+            return card, timeline, new_index
+
+        def jump_to_index(target_index: int, category: str):
+            """Jump to specific index from timeline click"""
+            items = PORTFOLIO.get(category, [])
+            if not items or target_index >= len(items):
+                return carousel_html.value, timeline_html.value, index_state.value
+
+            card = generate_card_html(items[target_index], category)
+
+            # Update timeline
+            sorted_for_timeline = sorted(
+                enumerate(items),
+                key=lambda x: x[1].get(
+                    "date", x[1].get("year", x[1].get("period", "0000"))
+                ),
+            )
+
+            timeline_items_html = []
+            for idx, (original_index, item) in enumerate(sorted_for_timeline):
+                date = item.get("date", item.get("year", item.get("period", "")))
+                active_class = "active" if original_index == target_index else ""
+
+                timeline_items_html.append(
+                    f"""
+                <div class="timeline-item {active_class}" onclick="document.getElementById('timeline-btn-{original_index}').click()">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">{date}</div>
+                </div>
+                """
+                )
+
+            timeline = f'<div class="timeline">{"".join(timeline_items_html)}</div>'
+
+            return card, timeline, target_index
 
         # Connect navigation buttons
         exp_btn.click(
             lambda: update_category("experiences"),
-            outputs=[
-                carousel_html,
-                timeline_html,
-                category_state,
-                index_state,
-                timeline_jump_index,
-            ],
+            outputs=[carousel_html, timeline_html, category_state, index_state],
         )
         skills_btn.click(
             lambda: update_category("skills"),
-            outputs=[
-                carousel_html,
-                timeline_html,
-                category_state,
-                index_state,
-                timeline_jump_index,
-            ],
+            outputs=[carousel_html, timeline_html, category_state, index_state],
         )
         cert_btn.click(
             lambda: update_category("certifications"),
-            outputs=[
-                carousel_html,
-                timeline_html,
-                category_state,
-                index_state,
-                timeline_jump_index,
-            ],
+            outputs=[carousel_html, timeline_html, category_state, index_state],
         )
         edu_btn.click(
             lambda: update_category("education"),
-            outputs=[
-                carousel_html,
-                timeline_html,
-                category_state,
-                index_state,
-                timeline_jump_index,
-            ],
+            outputs=[carousel_html, timeline_html, category_state, index_state],
         )
 
         prev_btn.click(
             lambda cat, idx: navigate_carousel(-1, cat, idx),
             inputs=[category_state, index_state],
-            outputs=[carousel_html, timeline_html, index_state, timeline_jump_index],
+            outputs=[carousel_html, timeline_html, index_state],
         )
         next_btn.click(
             lambda cat, idx: navigate_carousel(1, cat, idx),
             inputs=[category_state, index_state],
-            outputs=[carousel_html, timeline_html, index_state, timeline_jump_index],
+            outputs=[carousel_html, timeline_html, index_state],
         )
 
-        # Timeline click handler with improved debugging
-        timeline_jump_index.change(
-            jump_to_timeline_index,
-            inputs=[timeline_jump_index, category_state, index_state],
-            outputs=[carousel_html, timeline_html, index_state, timeline_jump_index],
+        # Connect timeline buttons
+        for i, btn in enumerate(timeline_buttons):
+            btn.click(
+                lambda idx=i, cat=category_state: jump_to_index(idx, cat.value),
+                inputs=[category_state],
+                outputs=[carousel_html, timeline_html, index_state],
+            )
+
+        # Add instruction for timeline navigation
+        gr.HTML(
+            f"""
+        <p style="text-align: center; color: {COLORS['text_muted']}; font-size: 0.85rem; margin-top: 1rem;">
+            💡 Cliquez sur les points de la timeline ou utilisez les flèches ◀ ▶ pour naviguer
+        </p>
+        """
         )
 
         # Chat interface with fixed wavebot logo
@@ -1786,7 +1785,7 @@ def create_interface():
         chatbot = gr.Chatbot(
             height=400,
             label="",
-            avatar_images=(None, chatbot_avatar),  # (user, bot)
+            avatar_images=(None, chatbot_avatar),
             bubble_full_width=False,
             show_label=False,
         )
@@ -1825,8 +1824,8 @@ def create_interface():
         send_btn.click(chat_with_agent, [msg, chatbot], [msg, chatbot])
 
         # Footer with model information
-        if USE_HF_MODEL:
-            model_info = "SmolAgent + Qwen2.5-Coder-32B (HuggingFace)"
+        if USE_HF_MODEL and agent:
+            model_info = f"SmolAgent + {working_model} (HuggingFace)"
         elif USE_SMOLAGENT_WITH_LITELLM:
             model_info = (
                 f"SmolAgent + {os.getenv('LITELLM_MODEL', 'GPT-4o-mini')} (LiteLLM)"
