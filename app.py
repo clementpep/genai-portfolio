@@ -187,7 +187,8 @@ CUSTOM_CSS = f"""
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, {COLORS['gradient_start']}, {COLORS['gradient_end']});
+    background: transparent;
+    border: 3px solid {COLORS['primary']};
     font-size: 2.5rem;
     box-shadow: 0 4px 16px {COLORS['shadow']};
     flex-shrink: 0;
@@ -226,8 +227,10 @@ CUSTOM_CSS = f"""
 }}
 
 .tech-badge {{
-    display: inline-block;
-    padding: 0.5rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem;
     background: rgba(31, 65, 53, 0.08);
     border: 1px solid {COLORS['border']};
     border-radius: 20px;
@@ -236,6 +239,7 @@ CUSTOM_CSS = f"""
     font-weight: 500;
     margin: 0.3rem;
     transition: all 0.3s ease;
+    cursor: help;
 }}
 
 .tech-badge:hover {{
@@ -243,6 +247,15 @@ CUSTOM_CSS = f"""
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px {COLORS['shadow']};
+}}
+
+.tech-badges-container {{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 1rem;
 }}
 
 .timeline {{
@@ -616,11 +629,9 @@ input:focus, textarea:focus {{
 }}
 
 .tech-badge img {{
-    width: 18px;
-    height: 18px;
+    width: 28px;
+    height: 28px;
     object-fit: contain;
-    vertical-align: middle;
-    margin-right: 8px;
     border-radius: 4px;
 }}
 
@@ -1041,13 +1052,14 @@ def generate_card_html(item: Dict, category: str) -> str:
 
     icon = item.get("icon", "")  # could be emoji OR filename
     title = item.get("title", "")
+    name = item.get("name", "")  # For certifications
     subtitle = item.get("client", item.get("issuer", item.get("school", "")))
     description = item.get("description", item.get("focus", ""))
     duration = item.get("duration", item.get("year", ""))
     techs = item.get("technologies", item.get("skills", []))
     impact = item.get("impact", "")
 
-    # Find client logo
+    # Find client/issuer/school logo
     client_logo_url = None
 
     # Check for client_logo field first
@@ -1055,6 +1067,8 @@ def generate_card_html(item: Dict, category: str) -> str:
         client_logo_paths = [
             f"logos/{item['client_logo']}",
             f"logos/clients/{item['client_logo']}",
+            f"logos/education/{item['client_logo']}",
+            f"logos/technologies/{item['client_logo']}",
         ]
 
         for path in client_logo_paths:
@@ -1063,15 +1077,32 @@ def generate_card_html(item: Dict, category: str) -> str:
                 client_logo_url = logo_data
                 break
 
-    # If no client_logo or logo not found, try to find based on client name
+    # If no client_logo or logo not found, try to find based on client/issuer/school name
     if not client_logo_url and subtitle:
-        client_base = subtitle.lower().replace(" ", "_").replace("-", "_")
-        client_logo_paths = [
-            f"logos/clients/{client_base}.png",
-            f"logos/clients/{client_base}.svg",
-            f"logos/{client_base}.png",
-            f"logos/{client_base}.svg",
-        ]
+        entity_base = subtitle.lower().replace(" ", "_").replace("-", "_")
+
+        # Determine which subfolder to search based on category
+        subfolders = (
+            ["clients", "technologies", "education"]
+            if category == "education"
+            else ["clients", "technologies"]
+        )
+
+        client_logo_paths = []
+        for subfolder in subfolders:
+            client_logo_paths.extend(
+                [
+                    f"logos/{subfolder}/{entity_base}.png",
+                    f"logos/{subfolder}/{entity_base}.svg",
+                ]
+            )
+        # Also try root logos folder
+        client_logo_paths.extend(
+            [
+                f"logos/{entity_base}.png",
+                f"logos/{entity_base}.svg",
+            ]
+        )
 
         for path in client_logo_paths:
             logo_data = embed_image_base64(path)
@@ -1086,7 +1117,7 @@ def generate_card_html(item: Dict, category: str) -> str:
         # fallback emoji or icon
         logo_html = f'<div style="font-size: 2.2rem;">{icon or "📌"}</div>'
 
-    # Generate tech badges with logos when available
+    # Generate tech badges with logos when available (logo only, text as title)
     tech_badges_html = []
     for tech in techs[:6]:
         tech_name = tech if isinstance(tech, str) else str(tech)
@@ -1113,29 +1144,50 @@ def generate_card_html(item: Dict, category: str) -> str:
                 break
 
         if logo_data:
+            # Only show logo, text appears on hover via title attribute
             tech_badges_html.append(
-                f'<span class="tech-badge"><img src="{logo_data}" alt="{tech_name}" />{tech_name}</span>'
+                f'<span class="tech-badge" title="{tech_name}"><img src="{logo_data}" alt="{tech_name}" /></span>'
             )
         else:
-            tech_badges_html.append(f'<span class="tech-badge">{tech_name}</span>')
+            # Fallback: show text if no logo
+            tech_badges_html.append(
+                f'<span class="tech-badge" title="{tech_name}">{tech_name}</span>'
+            )
 
-    # Join all tech badges
-    tech_badges = "".join(tech_badges_html)
+    # Join all tech badges in centered container
+    tech_badges = (
+        f'<div class="tech-badges-container">{"".join(tech_badges_html)}</div>'
+        if tech_badges_html
+        else ""
+    )
+
+    # Build title section - for certifications, show name prominently
+    if category == "certifications" and name:
+        title_section = f"""
+            <div style="flex: 1;">
+                <div class="card-subtitle">{subtitle}</div>
+                <div class="card-title" style="margin-top: 0.5rem;">{name}</div>
+            </div>
+        """
+    else:
+        title_section = f"""
+            <div style="flex: 1;">
+                <div class="card-title">{title}</div>
+                {f'<div class="card-subtitle">{subtitle}</div>' if subtitle else ''}
+            </div>
+        """
 
     # Return final card HTML
     return f"""
     <div class="card">
         <div class="card-header">
             <div class="card-logo">{logo_html}</div>
-            <div style="flex: 1;">
-                <div class="card-title">{title}</div>
-                {f'<div class="card-subtitle">{subtitle}</div>' if subtitle else ''}
-            </div>
+            {title_section}
         </div>
         <div class="card-content">{description}</div>
         {f'<div class="card-meta">📅 {duration}</div>' if duration else ''}
         {f'<div class="card-meta">🎯 {impact}</div>' if impact else ''}
-        <div style="margin-top: auto;">{tech_badges}</div>
+        {tech_badges}
     </div>
     """
 
@@ -1418,13 +1470,7 @@ def create_interface():
             f"""
         <div style="margin-top: 4rem;"></div>
         <div class="chat-header">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="{COLORS['primary']}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="10" rx="2" ry="2"></rect>
-                <circle cx="12" cy="5" r="2"></circle>
-                <path d="M12 7v4"></path>
-                <line x1="8" y1="16" x2="8" y2="16"></line>
-                <line x1="16" y1="16" x2="16" y2="16"></line>
-            </svg>
+            <img src="logos/technologies/wavebot.png" width="36" height="36" style="border-radius: 8px;" alt="WaveBot" />
             <span>PeponeAgent - Un agent IA spécialisé sur mon profil</span>
         </div>
         <p style="color: {COLORS['text_secondary']}; margin-bottom: 1.5rem; font-size: 0.95rem;">
@@ -1439,7 +1485,7 @@ def create_interface():
         chatbot = gr.Chatbot(
             height=400,
             label="",
-            avatar_images=(chatbot_avatar, None),
+            avatar_images=(None, chatbot_avatar),  # (user, bot)
             bubble_full_width=False,
             show_label=False,
         )
