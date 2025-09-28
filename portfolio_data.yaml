@@ -67,7 +67,6 @@ experiences:
       - SmolAgent
       - LiteLLM
       - Gradio
-      - Hugging Face
     impact: "2e prix international dans la catégorie AI Agents"
     sector: "Climate Tech"
 
@@ -133,7 +132,7 @@ experiences:
       (équivalent 50 ETP) grâce à une combinaison de règles métiers et de briques GenAI.
     technologies:
       - Dataiku
-      - SAP Ariba
+      - Ariba
       - Azure
       - Microsoft Graph
     impact: "Amélioration du temps de traitement de 98,3%, projet vitrine COMEX"

@@ -18,9 +18,17 @@ logos_path = os.path.join(os.path.dirname(__file__), "logos")
 
 # Determine which LLM to use based on environment
 USE_HF_MODEL = os.getenv("USE_HF_MODEL", "true").lower() == "true"
+USE_SMOLAGENT_WITH_LITELLM = (
+    os.getenv("USE_SMOLAGENT_WITH_LITELLM", "false").lower() == "true"
+)
 
-if USE_HF_MODEL:
-    from smolagents import CodeAgent, InferenceClientModel, tool
+if USE_HF_MODEL or USE_SMOLAGENT_WITH_LITELLM:
+    from smolagents import CodeAgent, tool
+
+    if USE_HF_MODEL:
+        from smolagents import InferenceClientModel
+    else:
+        from smolagents import LiteLLMModel
 else:
     from litellm import completion
 
@@ -187,11 +195,17 @@ CUSTOM_CSS = f"""
     display: flex;
     align-items: center;
     justify-content: center;
-    background: transparent;
-    border: 3px solid {COLORS['primary']};
+    background: {COLORS['surface']};
+    border: 2px solid {COLORS['border']};
     font-size: 2.5rem;
-    box-shadow: 0 4px 16px {COLORS['shadow']};
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     flex-shrink: 0;
+    transition: all 0.3s ease;
+}}
+
+.card-logo:hover {{
+    border-color: {COLORS['primary_light']};
+    box-shadow: 0 4px 12px {COLORS['shadow']};
 }}
 
 .card-title {{
@@ -366,10 +380,11 @@ CUSTOM_CSS = f"""
     width: 56px !important;
     height: 56px !important;
     min-width: 56px !important;
+    max-width: 56px !important;
     min-height: 56px !important;
-    aspect-ratio: 1 / 1 !important;
+    max-height: 56px !important;
     border-radius: 50% !important;
-    display: inline-flex !important;
+    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     color: {COLORS['text_primary']} !important;
@@ -378,9 +393,12 @@ CUSTOM_CSS = f"""
     transition: all 0.2s ease !important;
     box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important;
     padding: 0 !important;
+    margin: 0 !important;
     background: {COLORS['surface']} !important;
     border: 2px solid {COLORS['border']} !important;
-    flex-shrink: 0 !important; /* Prevent button from shrinking */
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    overflow: hidden !important;
 }}
 
 /* Hover state for nav buttons */
@@ -631,8 +649,11 @@ input:focus, textarea:focus {{
 .tech-badge img {{
     width: 28px;
     height: 28px;
+    min-height: 28px;
+    max-height: 28px;
     object-fit: contain;
     border-radius: 4px;
+    display: block;
 }}
 
 /* Skill card specific styling */
@@ -960,12 +981,12 @@ def analyze_profile_match(requirements: str) -> str:
 
 # Initialize agent based on environment
 if USE_HF_MODEL:
+    # SmolAgent with HuggingFace (FREE)
     model = InferenceClientModel(
         model_id="Qwen/Qwen2.5-Coder-32B-Instruct",
         temperature=0.7,
         token=os.getenv("HF_TOKEN"),
     )
-
     agent = CodeAgent(
         model=model,
         tools=[
@@ -978,6 +999,28 @@ if USE_HF_MODEL:
         max_steps=6,
         verbosity_level=0,
     )
+elif USE_SMOLAGENT_WITH_LITELLM:
+    # SmolAgent with LiteLLM backend (PAID but with tools)
+    model = LiteLLMModel(
+        model_id=os.getenv("LITELLM_MODEL", "gpt-4o-mini"),
+        api_key=os.getenv("OPENAI_API_KEY"),
+        temperature=0.7,
+    )
+    agent = CodeAgent(
+        model=model,
+        tools=[
+            list_clement_experiences,
+            list_clement_skills,
+            list_clement_certifications,
+            list_clement_education,
+            analyze_profile_match,
+        ],
+        max_steps=6,
+        verbosity_level=0,
+    )
+else:
+    # Pure LiteLLM without tools (PAID but faster)
+    agent = None
 
 
 def chat_with_agent(message: str, history: List) -> Tuple[str, List]:
@@ -992,8 +1035,8 @@ def chat_with_agent(message: str, history: List) -> Tuple[str, List]:
         Tuple of (empty string for input, updated history)
     """
     try:
-        if USE_HF_MODEL:
-            # Use SmolAgent
+        if USE_HF_MODEL or USE_SMOLAGENT_WITH_LITELLM:
+            # Use SmolAgent (with HF or LiteLLM backend)
             result = agent.run(message)
             response = (
                 result.get("output", str(result))
@@ -1001,7 +1044,7 @@ def chat_with_agent(message: str, history: List) -> Tuple[str, List]:
                 else str(result)
             )
         else:
-            # Use LiteLLM
+            # Use pure LiteLLM without tools
             context = f"""You are an AI assistant representing Clément Peponnet's GenAI & Agentic AI portfolio.
 
 Key Information:
@@ -1263,7 +1306,21 @@ def create_interface():
 
         # State variables
         category_state = gr.State("experiences")
-        index_state = gr.State(0)
+
+        # Get the most recent experience for initial display
+        experiences = PORTFOLIO.get("experiences", [])
+        if experiences:
+            sorted_experiences = sorted(
+                experiences,
+                key=lambda x: x.get("date", x.get("period", "0000")),
+                reverse=True,
+            )
+            most_recent_exp = sorted_experiences[0]
+            initial_index = experiences.index(most_recent_exp)
+        else:
+            initial_index = 0
+
+        index_state = gr.State(initial_index)
 
         # Header with social links
         gr.HTML(
@@ -1327,8 +1384,8 @@ def create_interface():
         # Navigation tabs
         with gr.Row():
             exp_btn = gr.Button("🚀 Expériences", elem_classes="nav-button")
-            skills_btn = gr.Button("💡 Expertise & Skills", elem_classes="nav-button")
             cert_btn = gr.Button("🏆 Certifications", elem_classes="nav-button")
+            skills_btn = gr.Button("💡 Expertise & Skills", elem_classes="nav-button")
             edu_btn = gr.Button("🎓 Études", elem_classes="nav-button")
 
         # Carousel display with proper alignment
@@ -1339,14 +1396,22 @@ def create_interface():
             prev_btn = gr.Button("◀", elem_classes="carousel-nav-btn", scale=1)
             # center column takes most space -> scale=6
             with gr.Column(scale=6, elem_classes="carousel-container"):
+                # Display the most recent experience initially
+                initial_experience = (
+                    experiences[initial_index]
+                    if experiences
+                    else PORTFOLIO["experiences"][0]
+                )
                 carousel_html = gr.HTML(
-                    generate_card_html(PORTFOLIO["experiences"][0], "experiences")
+                    generate_card_html(initial_experience, "experiences")
                 )
             next_btn = gr.Button("▶", elem_classes="carousel-nav-btn", scale=1)
 
         # Timeline with navigation hint
         timeline_html = gr.HTML(
-            generate_timeline_html(PORTFOLIO["experiences"], 0, "experiences")
+            generate_timeline_html(
+                PORTFOLIO["experiences"], initial_index, "experiences"
+            )
         )
 
         # Hidden index input for JavaScript communication
@@ -1377,9 +1442,19 @@ def create_interface():
         def update_category(category: str):
             items = PORTFOLIO.get(category, [])
             if items:
-                card = generate_card_html(items[0], category)
-                timeline = generate_timeline_html(items, 0, category)
-                return card, timeline, category, 0, -1
+                # Sort items by date to get the most recent first
+                sorted_items = sorted(
+                    items,
+                    key=lambda x: x.get("date", x.get("year", x.get("period", "0000"))),
+                    reverse=True,  # Most recent first
+                )
+                # Use the original index of the most recent item
+                most_recent_item = sorted_items[0]
+                most_recent_index = items.index(most_recent_item)
+
+                card = generate_card_html(most_recent_item, category)
+                timeline = generate_timeline_html(items, most_recent_index, category)
+                return card, timeline, category, most_recent_index, -1
             return carousel_html.value, timeline_html.value, category, 0, -1
 
         def navigate_carousel(direction: int, category: str, current_index: int):
@@ -1466,11 +1541,18 @@ def create_interface():
         )
 
         # Chat interface
+        wavebot_logo = embed_image_base64("logos/technologies/wavebot.png")
+        wavebot_img = (
+            f'<img src="{wavebot_logo}" width="36" height="36" style="border-radius: 8px;" alt="WaveBot" />'
+            if wavebot_logo
+            else "🤖"
+        )
+
         gr.HTML(
             f"""
         <div style="margin-top: 4rem;"></div>
         <div class="chat-header">
-            <img src="logos/technologies/wavebot.png" width="36" height="36" style="border-radius: 8px;" alt="WaveBot" />
+            {wavebot_img}
             <span>PeponeAgent - Un agent IA spécialisé sur mon profil</span>
         </div>
         <p style="color: {COLORS['text_secondary']}; margin-bottom: 1.5rem; font-size: 0.95rem;">
@@ -1524,11 +1606,15 @@ def create_interface():
         send_btn.click(chat_with_agent, [msg, chatbot], [msg, chatbot])
 
         # Footer
-        model_info = (
-            "Qwen2.5-Coder-32B (HuggingFace)"
-            if USE_HF_MODEL
-            else f"{os.getenv('LITELLM_MODEL', 'GPT-4o-mini')} (LiteLLM)"
-        )
+        if USE_HF_MODEL:
+            model_info = "SmolAgent + Qwen2.5-Coder-32B (HuggingFace)"
+        elif USE_SMOLAGENT_WITH_LITELLM:
+            model_info = (
+                f"SmolAgent + {os.getenv('LITELLM_MODEL', 'GPT-4o-mini')} (LiteLLM)"
+            )
+        else:
+            model_info = f"{os.getenv('LITELLM_MODEL', 'GPT-4o-mini')} (LiteLLM)"
+
         gr.HTML(
             f"""
         <div class="footer">
