@@ -184,6 +184,7 @@ certifications:
   - id: cert1
     name: "Azure AI Engineer Associate - AI-102"
     issuer: "Microsoft"
+    client_logo: azure_ai_cert.png
     year: "2025"
     date: "2025-06"
     icon: "☁️"
@@ -192,6 +193,7 @@ certifications:
   - id: cert2
     name: "Dataiku GenAI Practitioner"
     issuer: "Dataiku"
+    client_logo: dataiku.png
     year: "2025"
     date: "2025-07"
     icon: "📊"
@@ -200,11 +202,12 @@ certifications:
   - id: cert3
     name: "Hugging Face MCP Course"
     issuer: "Hugging Face"
+    client_logo: huggingface.png
     year: "2025"
     date: "2025-08"
     icon: "🤗"
     description: "Formation avancée sur l'implémentation du Model Context Protocol (MCP) et les bonnes pratiques Hugging Face."
-
+    
 education:
   - id: edu1
     school: "Arts & Métiers ParisTech"

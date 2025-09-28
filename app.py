@@ -42,6 +42,30 @@ def load_portfolio_data() -> Dict:
 
 PORTFOLIO = load_portfolio_data()
 
+# Technology links for clickable logos
+TECH_LINKS = {
+    "azure ai foundry": "https://ai.azure.com/",
+    "azure ai search": "https://azure.microsoft.com/en-us/products/ai-services/ai-search/",
+    "azure": "https://azure.microsoft.com/",
+    "azure kubernetes": "https://azure.microsoft.com/en-us/products/kubernetes-service/",
+    "mistral": "https://mistral.ai/",
+    "react": "https://react.dev/",
+    "flask": "https://flask.palletsprojects.com/",
+    "docker": "https://www.docker.com/",
+    "power automate": "https://powerautomate.microsoft.com/",
+    "copilot studio": "https://www.microsoft.com/en-us/microsoft-copilot/microsoft-copilot-studio",
+    "teams": "https://www.microsoft.com/en-us/microsoft-teams/group-chat-software",
+    "smolagent": "https://github.com/huggingfaceh4/smolagents",
+    "litellm": "https://docs.litellm.ai/",
+    "gradio": "https://gradio.app/",
+    "mcp": "https://modelcontextprotocol.io/",
+    "librechat": "https://librechat.ai/",
+    "microsoft graph": "https://developer.microsoft.com/en-us/graph",
+    "mcp shield": "https://github.com/modelcontextprotocol/servers",
+    "dataiku": "https://www.dataiku.com/",
+    "ariba": "https://www.sap.com/products/spend-management/procurement-solutions.html",
+}
+
 # Premium color scheme - Luxury Dark Green, Cream, Light Gray
 COLORS = {
     "primary": "#1f4135",  # Premium dark green
@@ -254,6 +278,7 @@ CUSTOM_CSS = f"""
     margin: 0.3rem;
     transition: all 0.3s ease;
     cursor: help;
+    text-decoration: none;
 }}
 
 .tech-badge:hover {{
@@ -261,6 +286,12 @@ CUSTOM_CSS = f"""
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px {COLORS['shadow']};
+    text-decoration: none;
+}}
+
+.tech-badge a, .tech-badge a:visited {{
+    color: inherit;
+    text-decoration: none;
 }}
 
 .tech-badges-container {{
@@ -462,7 +493,19 @@ CUSTOM_CSS = f"""
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
+}}
+
+.chat-header .wavebot-logo {{
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    flex-shrink: 0;
+}}
+
+.chat-header .agent-name {{
+    font-weight: 700;
+    color: {COLORS['primary']};
 }}
 
 button.primary {{
@@ -571,6 +614,9 @@ input:focus, textarea:focus {{
     border-radius: 8px !important;
     background: white !important;
     padding: 4px !important;
+    width: 32px !important;
+    height: 32px !important;
+    object-fit: contain !important;
 }}
 
 /* Send button styling */
@@ -1093,7 +1139,7 @@ def generate_card_html(item: Dict, category: str) -> str:
     if category == "skills":
         return generate_skills_card_html(item)
 
-    icon = item.get("icon", "")  # could be emoji OR filename
+    icon = item.get("icon", "")
     title = item.get("title", "")
     name = item.get("name", "")  # For certifications
     subtitle = item.get("client", item.get("issuer", item.get("school", "")))
@@ -1102,56 +1148,12 @@ def generate_card_html(item: Dict, category: str) -> str:
     techs = item.get("technologies", item.get("skills", []))
     impact = item.get("impact", "")
 
-    # Find client/issuer/school logo
+    # Find client/issuer/school logo - simplified logic using direct path
     client_logo_url = None
-
-    # Check for client_logo field first
     if "client_logo" in item:
-        client_logo_paths = [
-            f"logos/{item['client_logo']}",
-            f"logos/clients/{item['client_logo']}",
-            f"logos/education/{item['client_logo']}",
-            f"logos/technologies/{item['client_logo']}",
-        ]
-
-        for path in client_logo_paths:
-            logo_data = embed_image_base64(path)
-            if logo_data:
-                client_logo_url = logo_data
-                break
-
-    # If no client_logo or logo not found, try to find based on client/issuer/school name
-    if not client_logo_url and subtitle:
-        entity_base = subtitle.lower().replace(" ", "_").replace("-", "_")
-
-        # Determine which subfolder to search based on category
-        subfolders = (
-            ["clients", "technologies", "education"]
-            if category == "education"
-            else ["clients", "technologies"]
-        )
-
-        client_logo_paths = []
-        for subfolder in subfolders:
-            client_logo_paths.extend(
-                [
-                    f"logos/{subfolder}/{entity_base}.png",
-                    f"logos/{subfolder}/{entity_base}.svg",
-                ]
-            )
-        # Also try root logos folder
-        client_logo_paths.extend(
-            [
-                f"logos/{entity_base}.png",
-                f"logos/{entity_base}.svg",
-            ]
-        )
-
-        for path in client_logo_paths:
-            logo_data = embed_image_base64(path)
-            if logo_data:
-                client_logo_url = logo_data
-                break
+        logo_data = embed_image_base64(item["client_logo"])
+        if logo_data:
+            client_logo_url = logo_data
 
     # Logo HTML - either image or emoji
     if client_logo_url:
@@ -1160,7 +1162,7 @@ def generate_card_html(item: Dict, category: str) -> str:
         # fallback emoji or icon
         logo_html = f'<div style="font-size: 2.2rem;">{icon or "📌"}</div>'
 
-    # Generate tech badges with logos when available (logo only, text as title)
+    # Generate tech badges with logos and clickable links
     tech_badges_html = []
     for tech in techs[:6]:
         tech_name = tech if isinstance(tech, str) else str(tech)
@@ -1186,16 +1188,30 @@ def generate_card_html(item: Dict, category: str) -> str:
             if logo_data:
                 break
 
+        # Get link for technology
+        tech_link = TECH_LINKS.get(tech_name.lower(), "#")
+
         if logo_data:
-            # Only show logo, text appears on hover via title attribute
-            tech_badges_html.append(
-                f'<span class="tech-badge" title="{tech_name}"><img src="{logo_data}" alt="{tech_name}" /></span>'
-            )
+            # Logo with link if available
+            if tech_link != "#":
+                tech_badges_html.append(
+                    f'<a href="{tech_link}" target="_blank" class="tech-badge" title="{tech_name} - Cliquer pour visiter">'
+                    f'<img src="{logo_data}" alt="{tech_name}" /></a>'
+                )
+            else:
+                tech_badges_html.append(
+                    f'<span class="tech-badge" title="{tech_name}"><img src="{logo_data}" alt="{tech_name}" /></span>'
+                )
         else:
-            # Fallback: show text if no logo
-            tech_badges_html.append(
-                f'<span class="tech-badge" title="{tech_name}">{tech_name}</span>'
-            )
+            # Fallback: show text
+            if tech_link != "#":
+                tech_badges_html.append(
+                    f'<a href="{tech_link}" target="_blank" class="tech-badge" title="{tech_name} - Cliquer pour visiter">{tech_name}</a>'
+                )
+            else:
+                tech_badges_html.append(
+                    f'<span class="tech-badge" title="{tech_name}">{tech_name}</span>'
+                )
 
     # Join all tech badges in centered container
     tech_badges = (
@@ -1384,8 +1400,8 @@ def create_interface():
         # Navigation tabs
         with gr.Row():
             exp_btn = gr.Button("🚀 Expériences", elem_classes="nav-button")
-            cert_btn = gr.Button("🏆 Certifications", elem_classes="nav-button")
             skills_btn = gr.Button("💡 Expertise & Skills", elem_classes="nav-button")
+            cert_btn = gr.Button("🏆 Certifications", elem_classes="nav-button")
             edu_btn = gr.Button("🎓 Études", elem_classes="nav-button")
 
         # Carousel display with proper alignment
@@ -1424,15 +1440,50 @@ def create_interface():
         </p>
         <script>
         window.jumpToCard = function(index) {{
-            // Find the hidden number input
-            const inputs = document.querySelectorAll('input[type="number"]');
-            for (let input of inputs) {{
-                if (input.parentElement.style.display === 'none') {{
-                    input.value = index;
-                    input.dispatchEvent(new Event('input', {{ bubbles: true }}));
+            console.log('jumpToCard called with index:', index);
+            // Find the timeline jump input (should be the last number input that's hidden)
+            const allInputs = document.querySelectorAll('input[type="number"]');
+            let timelineInput = null;
+            
+            // Look for the input that's in a hidden container
+            for (let i = allInputs.length - 1; i >= 0; i--) {{
+                const input = allInputs[i];
+                const container = input.closest('.gr-form');
+                if (container && container.style.display === 'none') {{
+                    timelineInput = input;
                     break;
                 }}
             }}
+            
+            if (timelineInput) {{
+                console.log('Found timeline input, setting value to:', index);
+                timelineInput.value = index;
+                
+                // Trigger multiple events to ensure Gradio picks it up
+                timelineInput.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                timelineInput.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                
+                // Alternative method using Gradio's internal event system
+                if (window.gradio && window.gradio.dispatch) {{
+                    window.gradio.dispatch('change', timelineInput);
+                }}
+            }} else {{
+                console.error('Timeline input not found');
+            }}
+        }}
+        
+        // Debug function to check inputs
+        window.debugInputs = function() {{
+            const inputs = document.querySelectorAll('input[type="number"]');
+            console.log('Found', inputs.length, 'number inputs:');
+            inputs.forEach((input, i) => {{
+                const container = input.closest('.gr-form');
+                console.log(`Input ${{i}}:`, {{
+                    value: input.value,
+                    hidden: container ? container.style.display === 'none' : false,
+                    element: input
+                }});
+            }});
         }}
         </script>
         """
@@ -1543,7 +1594,7 @@ def create_interface():
         # Chat interface
         wavebot_logo = embed_image_base64("logos/technologies/wavebot.png")
         wavebot_img = (
-            f'<img src="{wavebot_logo}" width="36" height="36" style="border-radius: 8px;" alt="WaveBot" />'
+            f'<img src="{wavebot_logo}" class="wavebot-logo" alt="WaveBot" />'
             if wavebot_logo
             else "🤖"
         )
@@ -1553,7 +1604,7 @@ def create_interface():
         <div style="margin-top: 4rem;"></div>
         <div class="chat-header">
             {wavebot_img}
-            <span>PeponeAgent - Un agent IA spécialisé sur mon profil</span>
+            <span><span class="agent-name">PeponeAgent</span> - Un agent IA spécialisé sur mon profil</span>
         </div>
         <p style="color: {COLORS['text_secondary']}; margin-bottom: 1.5rem; font-size: 0.95rem;">
             Posez-lui vos questions sur mon profil, mes expériences GenAI & Agentic, mes compétences techniques ou demandez-lui une analyse de correspondance avec vos besoins.
