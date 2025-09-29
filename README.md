@@ -42,7 +42,6 @@ A premium portfolio showcasing GenAI and Agentic AI expertise with an elegant da
   - `list_clement_skills` - Get skills by category
   - `list_clement_certifications` - View all certifications
   - `list_clement_education` - Educational background
-  - `analyze_profile_match` - Match profile against job requirements
 
 ### 🔗 Social Integration
 - LinkedIn profile with custom icon
@@ -233,12 +232,6 @@ The AI assistant uses custom tools to query your portfolio:
    ```python
    # Get educational background
    "Tell me about the education"
-   ```
-
-5. **`analyze_profile_match`**
-   ```python
-   # Analyze match with job requirements
-   "Analyze match for: Senior GenAI Engineer with Azure and multi-agent experience"
    ```
 
 ## 🐛 Troubleshooting

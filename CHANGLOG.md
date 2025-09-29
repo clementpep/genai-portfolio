@@ -71,7 +71,6 @@ All notable changes to this portfolio project will be documented in this file.
   - `list_clement_skills`
   - `list_clement_certifications`
   - `list_clement_education`
-  - `analyze_profile_match`
 - Timeline navigation system
 - Social media integration (LinkedIn, GitHub)
 - Statistics dashboard
