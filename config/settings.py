@@ -45,14 +45,6 @@ EASTER_EGG_TERMS = {
     "chnawax": {"gender": "mon", "special": False},
 }
 
-EASTER_EGG_PROMPT = os.getenv(
-    "EASTER_EGG_MODE_PROMPT",
-    """You are PeponeAgent on vacation mode! You're relaxed, funny, and enjoying the sun.
-Be playful, humorous, and lighthearted in your responses while still being helpful.
-Use casual language and feel free to joke around.
-Remember: the user found an easter egg, so celebrate that with them!""",
-)
-
 # Technology links for clickable logos
 TECH_LINKS = {
     "azure ai foundry": "https://ai.azure.com/",

@@ -495,23 +495,34 @@ def get_custom_css() -> str:
 .easter-egg-notification {{
     background: linear-gradient(135deg, #FFD700, #FFA500);
     color: #1f4135;
-    padding: 1rem 1.5rem;
+    padding: 1.25rem 2rem;
     border-radius: 16px;
     text-align: center;
     font-weight: 600;
-    margin: 1rem 0;
-    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
-    animation: slideIn 0.5s ease-out;
+    font-size: 1.05rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+    animation: slideInBounce 0.6s ease-out;
+    border: 2px solid rgba(255, 165, 0, 0.3);
 }}
 
-@keyframes slideIn {{
-    from {{
+.easter-egg-container {{
+    min-height: 0;
+    transition: all 0.3s ease;
+}}
+
+@keyframes slideInBounce {{
+    0% {{
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-30px) scale(0.9);
     }}
-    to {{
+    60% {{
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(5px) scale(1.02);
+    }}
+    100% {{
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }}
 }}
 

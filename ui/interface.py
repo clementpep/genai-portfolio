@@ -272,7 +272,7 @@ def _generate_initial_timeline(items: list, initial_index: int) -> str:
 
 def _create_chat_interface(portfolio_data: dict):
     """
-    Create the chat interface section.
+    Create the chat interface section with easter egg notification.
 
     Args:
         portfolio_data: Full portfolio data
@@ -296,6 +296,9 @@ def _create_chat_interface(portfolio_data: dict):
     </p>
     """
     )
+
+    # Easter egg notification component (initially empty)
+    easter_egg_notification = gr.HTML(value="", elem_classes="easter-egg-container")
 
     chatbot_avatar = os.path.join(LOGOS_PATH, "technologies", "wavebot.png")
 
@@ -330,17 +333,21 @@ def _create_chat_interface(portfolio_data: dict):
 
     gr.Examples(
         examples=[
-            "En quoi Clément serait adapté pour un post de tech lead GenAI ?",
             "Quelle expérience Clément a-t-il avec le MCP ?",
-            "Quelles technologies GenAI maîtrise Clément ?",
+            "Quelles technologies Agents & MCP Clément maîtrise-t-il ?",
+            "Quels services et frameworks GenAI Clément maîtrise-t-il ?",
         ],
         inputs=msg,
         label="Questions suggérées",
     )
 
-    # Chat functionality using agent_manager
-    msg.submit(agent_manager.chat, [msg, chatbot], [msg, chatbot])
-    send_btn.click(agent_manager.chat, [msg, chatbot], [msg, chatbot])
+    # Chat functionality with easter egg notification handling
+    msg.submit(
+        agent_manager.chat, [msg, chatbot], [msg, chatbot, easter_egg_notification]
+    )
+    send_btn.click(
+        agent_manager.chat, [msg, chatbot], [msg, chatbot, easter_egg_notification]
+    )
 
 
 # Navigation functions

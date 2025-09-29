@@ -18,7 +18,6 @@ from config.settings import (
     AGENT_MAX_STEPS,
     AGENT_VERBOSITY,
     EASTER_EGG_TERMS,
-    EASTER_EGG_PROMPT,
 )
 from tools.portfolio_tools import AVAILABLE_TOOLS, get_tools_description
 from core.data_loader import portfolio_loader
@@ -108,58 +107,43 @@ class AgentManager:
     def _get_base_system_prompt(self) -> str:
         """
         Generate the base system prompt for the agent.
+        Optimized for faster response times.
 
         Returns:
-            str: System prompt describing PeponeAgent's role and capabilities
+            str: Concise system prompt describing PeponeAgent's role
         """
-        portfolio = portfolio_loader.load()
+        return """Tu es PeponeAgent, spécialisé dans le portfolio GenAI de Clément Peponnet.  
 
-        return f"""You are PeponeAgent, an AI assistant specialized in Clement Peponnet's professional portfolio.
+Expertises : GenAI, Agentic AI, MCP (Model Context Protocol), Azure AI  
+Rôle : Tech Lead en systèmes multi-agents  
 
-Your role is to help users understand Clement's expertise in GenAI, Agentic AI, and the Model Context Protocol (MCP).
+Si nécessaire, utilise tes outils pour répondre aux questions concernant :  
+- Les expériences professionnelles et projets  
+- Les compétences techniques et certifications  
+- La formation et les réalisations  
+- L’adéquation du profil avec des besoins ou offres d’emploi  
 
-Key Information:
-- Expert in GenAI, Agentic AI, and MCP (Model Context Protocol)
-- Tech Lead with experience in multi-agent systems
-- Certifications: {', '.join([cert['name'] for cert in portfolio.get('certifications', [])])}
-- Recent projects: multi-agent systems, MCP servers, GenAI translation MVP
+Sois concis, professionnel et utilise les outils uniquement quand c’est nécessaire, en ciblant spécifiquement ceux dont tu aurais besoin.
+"""
 
-Portfolio Summary:
-- {len(portfolio.get('experiences', []))} professional experiences
-- {len(portfolio.get('skills', []))} skill categories
-- {len(portfolio.get('certifications', []))} certifications
-
-{get_tools_description()}
-
-IMPORTANT: There is an easter egg hidden in this chat. Users need to discover it on their own by using special keywords. 
-You cannot help them find it or give hints about it. If they ask about easter eggs, politely deflect without revealing anything.
-
-Answer questions professionally and highlight relevant experiences using the tools at your disposal when appropriate."""
-
-    def _get_vacation_system_prompt(self, term: str, gender: str) -> str:
+    def _get_chill_system_prompt(self, term: str, gender: str) -> str:
         """
-        Generate the vacation mode system prompt when easter egg is triggered.
+        Generate the chill mode system prompt when easter egg is triggered.
 
         Args:
             term: The easter egg term that was used
             gender: The grammatical gender for the term (ma/mon)
 
         Returns:
-            str: Vacation mode system prompt
+            str: Chill mode system prompt
         """
-        return f"""You are PeponeAgent in VACATION MODE! 
+        return f"""Tu es PeponeAgent en mode coquinou !  
 
-The user just discovered the easter egg by saying '{term}'! You're now totally relaxed, on vacation, enjoying the sun, and in a playful mood.
+L’utilisateur vient de découvrir l’easter egg en disant « {term} » !  
+Tu es maintenant de chasseur de soleil, sur l'autoroute du kiff, et dans un mood coquinou.  
 
-Be:
-- Fun, humorous, and lighthearted
-- Still helpful about Clement's portfolio, but in a casual, friendly way
-- Playful with your language
-- Enthusiastic about the fact they found the easter egg
-
-You can still use your tools to answer questions about Clement's profile, but do it with style and humor!
-
-Remember: You're on vacation mode - keep it fun while staying informative!"""
+Tu peux toujours utiliser tes outils pour répondre aux questions sur le profil de Clément,  
+mais fais-le en mode chill !"""
 
     def _detect_easter_egg(self, message: str) -> Optional[Tuple[str, str, bool]]:
         """
@@ -201,9 +185,22 @@ Remember: You're on vacation mode - keep it fun while staying informative!"""
         else:
             return f"Coucouuuuu {gender} {term} !!!! Comment ça va par ici ??"
 
+    def _generate_notification_html(self) -> str:
+        """
+        Generate the HTML for easter egg notification display.
+
+        Returns:
+            str: HTML notification element
+        """
+        return """
+        <div class="easter-egg-notification">
+            🎉 <strong>Easter Egg trouvé !</strong> Tu as débloqué le plein potentiel de PeponeAgent! 🎉
+        </div>
+        """
+
     def chat(
         self, message: str, history: List[Tuple[str, str]]
-    ) -> Tuple[str, List[Tuple[str, str]]]:
+    ) -> Tuple[str, List[Tuple[str, str]], str]:
         """
         Process a chat message and generate a response.
 
@@ -212,10 +209,11 @@ Remember: You're on vacation mode - keep it fun while staying informative!"""
             history: Chat history as list of (user_msg, assistant_msg) tuples
 
         Returns:
-            Tuple[str, List]: (empty string for input clear, updated history with notification if easter egg)
+            Tuple[str, List, str]: (empty string for input clear, updated history, notification HTML)
         """
         # Check for easter egg
         easter_egg = self._detect_easter_egg(message)
+        notification_html = ""
 
         try:
             if easter_egg:
@@ -224,18 +222,17 @@ Remember: You're on vacation mode - keep it fun while staying informative!"""
                 # Generate easter egg greeting
                 greeting = self._generate_easter_egg_response(term, gender, is_special)
 
-                # Generate notification
-                notification = "🎉 Easter egg found: You have unlocked the full potential of PeponeAgent! 🎉"
+                # Generate notification HTML for UI display
+                notification_html = self._generate_notification_html()
 
-                # Continue with the actual response in vacation mode
+                # Continue with the actual response in chill mode
                 if self.agent and self.agent_type in [
                     "smolagent_hf",
                     "smolagent_litellm",
                 ]:
-                    # Use SmolAgent with vacation mode
-                    vacation_prompt = self._get_vacation_system_prompt(term, gender)
-                    # For SmolAgent, we prepend the context to the message
-                    enriched_message = f"{vacation_prompt}\n\nUser message: {message}"
+                    # Use SmolAgent with chill mode
+                    chill_prompt = self._get_chill_system_prompt(term, gender)
+                    enriched_message = f"{chill_prompt}\n\nUser message: {message}"
                     result = self.agent.run(enriched_message)
                     response = (
                         result.get("output", str(result))
@@ -244,18 +241,18 @@ Remember: You're on vacation mode - keep it fun while staying informative!"""
                     )
                     full_response = f"{greeting}\n\n{response}"
                 else:
-                    # Use LiteLLM with vacation mode
+                    # Use LiteLLM with chill mode
                     from litellm import completion
 
-                    vacation_prompt = self._get_vacation_system_prompt(term, gender)
-                    messages = [{"role": "system", "content": vacation_prompt}]
+                    chill_prompt = self._get_chill_system_prompt(term, gender)
+                    messages = [{"role": "system", "content": chill_prompt}]
 
                     # Add history
                     for user_msg, assistant_msg in history:
                         messages.append({"role": "user", "content": user_msg})
                         messages.append({"role": "assistant", "content": assistant_msg})
 
-                    # Add current message with greeting prepended to context
+                    # Add greeting and current message
                     messages.append({"role": "assistant", "content": greeting})
                     messages.append({"role": "user", "content": message})
 
@@ -269,9 +266,8 @@ Remember: You're on vacation mode - keep it fun while staying informative!"""
                     response = llm_response.choices[0].message.content
                     full_response = f"{greeting}\n\n{response}"
 
-                # Add notification as a separate message before the response
-                history.append((message, notification))
-                history.append(("", full_response))
+                # Add response to history
+                history.append((message, full_response))
 
             else:
                 # Normal chat flow
@@ -311,12 +307,12 @@ Remember: You're on vacation mode - keep it fun while staying informative!"""
 
                 history.append((message, response))
 
-            return "", history
+            return "", history, notification_html
 
         except Exception as e:
             error_msg = f"I encountered an error: {str(e)}. Please try again."
             history.append((message, error_msg))
-            return "", history
+            return "", history, notification_html
 
     def get_model_info(self) -> str:
         """
